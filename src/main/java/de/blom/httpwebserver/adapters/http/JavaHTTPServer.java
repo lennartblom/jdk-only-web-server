@@ -1,6 +1,8 @@
 package de.blom.httpwebserver.adapters.http;
 
+import de.blom.httpwebserver.common.HTTPResponseOutput;
 import de.blom.httpwebserver.enums.HTTPMethod;
+import org.apache.commons.httpclient.HttpStatus;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -27,11 +29,18 @@ public class JavaHTTPServer implements Runnable{
     static final int PORT = 8080;
     static final boolean verbose = true;
 
+    private HTTPResponseOutput httpResponseOutput;
     private Socket connect;
 
     public JavaHTTPServer(Socket c) {
-        connect = c;
+        this.connect = c;
     }
+
+    public JavaHTTPServer(Socket c, HTTPResponseOutput httpResponseOutput) {
+        this(c);
+        this.httpResponseOutput = httpResponseOutput;
+    }
+
 
     public static void main(String[] args) {
         try {
@@ -165,10 +174,7 @@ public class JavaHTTPServer implements Runnable{
         if (HTTPMethod.GET.name().equals(method)) {
             byte[] fileData = readFileData(file, fileLength);
 
-            // send HTTP Headers
-            out.println("HTTP/1.1 200 OK");
-            out.println("Server: Java HTTP Server from SSaurel : 1.0");
-            out.println("Date: " + new Date());
+            this.httpResponseOutput.writeResponse(HttpStatus.SC_OK, out);
             out.println("Content-type: " + content);
             out.println("Content-length: " + fileLength);
             out.println(); // blank line between headers and content, very important !
@@ -206,7 +212,6 @@ public class JavaHTTPServer implements Runnable{
         return fileData;
     }
 
-    // return supported MIME Types
     String getContentType(String fileRequested) {
         if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
             return "text/html";
@@ -214,15 +219,13 @@ public class JavaHTTPServer implements Runnable{
             return "text/plain";
     }
 
-    private void handleFileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
+    void handleFileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
         File file = this.retrieveFile(FILE_NOT_FOUND);
         int fileLength = (int) file.length();
         String content = "text/html";
         byte[] fileData = readFileData(file, fileLength);
 
-        out.println("HTTP/1.1 404 File Not Found");
-        out.println("Server: Java HTTP Server from SSaurel : 1.0");
-        out.println("Date: " + new Date());
+        this.httpResponseOutput.writeResponse(HttpStatus.SC_NOT_FOUND, out);
         out.println("Content-type: " + content);
         out.println("Content-length: " + fileLength);
         out.println(); // blank line between headers and content, very important !

@@ -10,17 +10,26 @@ public class HTTPResponseOutput {
     public void writeResponse(int httpStatus, PrintWriter out) {
         switch (httpStatus) {
             case HttpStatus.SC_NOT_FOUND:
-                write404Response(out);
+                this.write404Response(out);
                 break;
 
             case HttpStatus.SC_OK:
-                write200Response(out);
+                this.write200Response(out);
+                break;
+
+            case HttpStatus.SC_NOT_IMPLEMENTED:
+                this.write501Response(out);
                 break;
 
             default:
 
                 break;
         }
+    }
+
+    void write501Response(PrintWriter out) {
+        out.println("HTTP/1.1 501 Not Implemented");
+        writeServerAndDateInformation(out);
     }
 
     void write200Response(PrintWriter out) {

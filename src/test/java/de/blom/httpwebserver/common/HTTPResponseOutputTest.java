@@ -48,10 +48,26 @@ public class HTTPResponseOutputTest {
     }
 
     @Test
+    public void expectToCall501Method() {
+        this.httpResponseOutput.writeResponse(HttpStatus.SC_NOT_IMPLEMENTED, this.out);
+
+        verify(this.httpResponseOutput).write501Response(this.out);
+    }
+
+    @Test
     public void expectToOutputCorrect200Status() {
         this.httpResponseOutput.write200Response(out);
 
         verify(this.out).println(eq("HTTP/1.1 200 OK"));
+        verify(this.out).println(eq("Server: Java HTTP Server"));
+        verify(this.out).println(eq("Date: " + this.currentDate));
+    }
+
+    @Test
+    public void expectToOutputCorrect501Status() {
+        this.httpResponseOutput.write501Response(out);
+
+        verify(this.out).println(eq("HTTP/1.1 501 Not Implemented"));
         verify(this.out).println(eq("Server: Java HTTP Server"));
         verify(this.out).println(eq("Date: " + this.currentDate));
     }

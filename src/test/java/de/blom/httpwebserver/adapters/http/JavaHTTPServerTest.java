@@ -1,8 +1,11 @@
 package de.blom.httpwebserver.adapters.http;
 
+import de.blom.httpwebserver.common.HTTPResponseOutput;
+import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -14,10 +17,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JavaHTTPServerTest {
 
+    @InjectMocks
     private JavaHTTPServer javaHTTPServer;
 
     @Mock
@@ -25,6 +30,9 @@ public class JavaHTTPServerTest {
 
     @Mock
     private PrintWriter out;
+
+    @Mock
+    private HTTPResponseOutput httpResponseOutput;
 
     @Mock
     private BufferedOutputStream dataOut;
@@ -38,26 +46,31 @@ public class JavaHTTPServerTest {
 
     @Before
     public void setup(){
-        this.javaHTTPServer = new JavaHTTPServer(this.mockedSocket);
+        this.javaHTTPServer = new JavaHTTPServer(this.mockedSocket, this.httpResponseOutput);
     }
 
     @Test
     public void expectToCloseElementsProperly() throws IOException {
-
-
         this.javaHTTPServer.closeElements(this.in, this.out, this.dataOut);
 
-        Mockito.verify(this.mockedSocket).close();
-        Mockito.verify(this.in).close();
-        Mockito.verify(this.out).close();
-        Mockito.verify(this.dataOut).close();
+        verify(this.mockedSocket).close();
+        verify(this.in).close();
+        verify(this.out).close();
+        verify(this.dataOut).close();
     }
 
     @Test
     public void expectToWrite200WhenFileRequestIsHandled() throws IOException {
         this.javaHTTPServer.handleFileRequest(DUMMY_FILE_REQUESTED, GET, this.out, this.dataOut);
 
+        verify(this.httpResponseOutput).writeResponse(HttpStatus.SC_OK, this.out);
+    }
 
+    @Test
+    public void expectToWrite404WhenNotFoundIsHandled() throws IOException {
+        this.javaHTTPServer.handleFileNotFound(this.out, this.dataOut, DUMMY_FILE_REQUESTED);
+
+        verify(this.httpResponseOutput).writeResponse(HttpStatus.SC_NOT_FOUND, this.out);
     }
 
 }
