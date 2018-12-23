@@ -1,0 +1,4 @@
+
+language: java
+
+  clean install test
