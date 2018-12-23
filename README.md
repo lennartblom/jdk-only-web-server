@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.org/lennartblom/http-content-delivery-server.svg?branch=master)](https://travis-ci.org/lennartblom/http-content-delivery-server)
