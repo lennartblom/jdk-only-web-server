@@ -130,9 +130,14 @@ public class JavaHTTPServer implements Runnable{
         return parse.nextToken().toUpperCase();
     }
 
-    private StringTokenizer parseInput(BufferedReader in) throws IOException {
+    StringTokenizer parseInput(BufferedReader in) throws IOException {
         String input = in.readLine();
-        return new StringTokenizer(input);
+        if(input != null){
+            return new StringTokenizer(input);
+        }else{
+            throw new IOException();
+        }
+
     }
 
     void closeElements(BufferedReader in, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
@@ -154,11 +159,14 @@ public class JavaHTTPServer implements Runnable{
         //read content to return to client
         byte[] fileData = readFileData(file, fileLength);
         // we send HTTP Headers with data to client
-        this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_NOT_IMPLEMENTED, out);
+        this.writeHttpResponse(out, dataOut, fileLength, contentMimeType, fileData, HttpStatus.SC_NOT_IMPLEMENTED);
+    }
+
+    void writeHttpResponse(PrintWriter out, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
+        this.httpResponseOutput.writeResponseHeader(statusCode, out);
         this.httpResponseOutput.writeResponseContentInformation(contentMimeType, fileLength, out);
-        out.println(); // blank line between headers and content, very important !
-        out.flush(); // flush character output stream buffer
-        // file
+        out.println();
+        out.flush();
         dataOut.write(fileData, 0, fileLength);
         dataOut.flush();
     }
@@ -172,13 +180,7 @@ public class JavaHTTPServer implements Runnable{
         if (HTTPMethod.GET.name().equals(method)) {
             byte[] fileData = readFileData(file, fileLength);
 
-            this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_OK, out);
-            this.httpResponseOutput.writeResponseContentInformation(content, fileLength, out);
-            out.println(); // blank line between headers and content, very important !
-            out.flush(); // flush character output stream buffer
-
-            dataOut.write(fileData, 0, fileLength);
-            dataOut.flush();
+            this.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_OK);
         }
 
         if (verbose) {
@@ -216,19 +218,13 @@ public class JavaHTTPServer implements Runnable{
             return "text/plain";
     }
 
-    void handleFileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
+    void handleFileNotFound(PrintWriter out, BufferedOutputStream dataOut, String fileRequested) throws IOException {
         File file = this.retrieveFile(FILE_NOT_FOUND);
         int fileLength = (int) file.length();
         String content = "text/html";
         byte[] fileData = readFileData(file, fileLength);
 
-        this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_NOT_FOUND, out);
-        this.httpResponseOutput.writeResponseContentInformation(content, fileLength, out);
-        out.println(); // blank line between headers and content, very important !
-        out.flush(); // flush character output stream buffer
-
-        dataOut.write(fileData, 0, fileLength);
-        dataOut.flush();
+        this.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_NOT_FOUND);
 
         if (verbose) {
             System.out.println("File " + fileRequested + " not found");

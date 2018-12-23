@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.BufferedOutputStream;
@@ -18,10 +19,15 @@ import java.net.Socket;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JavaHTTPServerTest {
 
+    private static final int FILE_LENGTH = 132;
+    private static final byte[] FILE_DATA = new byte[52];
+    private static final int STATUS_CODE = HttpStatus.SC_OK;
+    private static final String MIME_TYPE = "text/html";
     @InjectMocks
     private JavaHTTPServer javaHTTPServer;
 
@@ -46,7 +52,7 @@ public class JavaHTTPServerTest {
     private static final String PUT = "PUT";
 
     @Before
-    public void setup(){
+    public void setup() {
         this.javaHTTPServer = new JavaHTTPServer(this.mockedSocket, this.httpResponseOutput);
     }
 
@@ -81,6 +87,26 @@ public class JavaHTTPServerTest {
 
         verify(this.httpResponseOutput).writeResponseHeader(HttpStatus.SC_NOT_FOUND, this.out);
         verify(this.httpResponseOutput).writeResponseContentInformation(eq("text/html"), any(int.class), eq(this.out));
+    }
+
+    @Test(expected = IOException.class)
+    public void expectToHandleNullpointer() throws IOException {
+        when(this.in.readLine()).thenReturn(null);
+
+        this.javaHTTPServer.parseInput(this.in);
+    }
+
+    @Test
+    public void expectToReturnValidHttpResponse() throws IOException {
+        this.javaHTTPServer.writeHttpResponse(this.out, this.dataOut, FILE_LENGTH, MIME_TYPE, FILE_DATA, STATUS_CODE);
+
+        verify(this.httpResponseOutput).writeResponseHeader(STATUS_CODE, this.out);
+        verify(this.httpResponseOutput).writeResponseContentInformation(MIME_TYPE, FILE_LENGTH, this.out);
+
+        verify(this.out).flush();
+
+        verify(this.dataOut).write(FILE_DATA, 0, FILE_LENGTH);
+        verify(this.dataOut).flush();
     }
 
 }
