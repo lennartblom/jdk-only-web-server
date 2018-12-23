@@ -18,7 +18,10 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class HTTPResponseOutputTest {
 
-    public static final String SERVER_INFO = "Server: Java HTTP Server";
+    private static final String SERVER_INFO = "Server: Java HTTP Server";
+    private static final String TEXT_HTML = "text/html";
+    private static final int FILE_LENGTH = 123;
+
     @Spy
     private HTTPResponseOutput httpResponseOutput;
 
@@ -28,7 +31,7 @@ public class HTTPResponseOutputTest {
     private Date currentDate = new Date();
 
     @Before
-    public void setup(){
+    public void setup() {
         when(this.httpResponseOutput.getCurrentDate()).thenReturn(this.currentDate);
     }
 
@@ -78,6 +81,13 @@ public class HTTPResponseOutputTest {
         verify(this.out).println(eq("HTTP/1.1 404 File Not Found"));
         verify(this.out).println(eq(SERVER_INFO));
         verify(this.out).println(eq("Date: " + this.currentDate));
+    }
+
+    @Test
+    public void expectToOutputCorrectContentInformation() {
+        this.httpResponseOutput.writeResponseContentInformation(TEXT_HTML, FILE_LENGTH, this.out);
+        verify(this.out).println("Content-type: " + TEXT_HTML);
+        verify(this.out).println("Content-length: " + FILE_LENGTH);
     }
 
 

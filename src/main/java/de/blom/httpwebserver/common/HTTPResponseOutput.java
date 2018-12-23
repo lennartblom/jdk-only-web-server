@@ -6,11 +6,6 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 public class HTTPResponseOutput {
-
-    public void writeResponseContent(String contentType, int fileLength, PrintWriter out){
-
-    }
-
     public void writeResponseHeader(int httpStatus, PrintWriter out) {
         switch (httpStatus) {
             case HttpStatus.SC_NOT_FOUND:
@@ -29,6 +24,11 @@ public class HTTPResponseOutput {
 
                 break;
         }
+    }
+
+    public void writeResponseContentInformation(String contentType, int fileLength, PrintWriter out){
+        out.println("Content-type: " + contentType);
+        out.println("Content-length: " + fileLength);
     }
 
     void write501Response(PrintWriter out) {

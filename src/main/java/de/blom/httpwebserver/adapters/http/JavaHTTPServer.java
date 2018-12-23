@@ -33,6 +33,7 @@ public class JavaHTTPServer implements Runnable{
     private Socket connect;
 
     public JavaHTTPServer(Socket c) {
+        this.httpResponseOutput = new HTTPResponseOutput();
         this.connect = c;
     }
 
@@ -154,8 +155,7 @@ public class JavaHTTPServer implements Runnable{
         byte[] fileData = readFileData(file, fileLength);
         // we send HTTP Headers with data to client
         this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_NOT_IMPLEMENTED, out);
-        out.println("Content-type: " + contentMimeType);
-        out.println("Content-length: " + fileLength);
+        this.httpResponseOutput.writeResponseContentInformation(contentMimeType, fileLength, out);
         out.println(); // blank line between headers and content, very important !
         out.flush(); // flush character output stream buffer
         // file
@@ -173,8 +173,7 @@ public class JavaHTTPServer implements Runnable{
             byte[] fileData = readFileData(file, fileLength);
 
             this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_OK, out);
-            out.println("Content-type: " + content);
-            out.println("Content-length: " + fileLength);
+            this.httpResponseOutput.writeResponseContentInformation(content, fileLength, out);
             out.println(); // blank line between headers and content, very important !
             out.flush(); // flush character output stream buffer
 
@@ -224,8 +223,7 @@ public class JavaHTTPServer implements Runnable{
         byte[] fileData = readFileData(file, fileLength);
 
         this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_NOT_FOUND, out);
-        out.println("Content-type: " + content);
-        out.println("Content-length: " + fileLength);
+        this.httpResponseOutput.writeResponseContentInformation(content, fileLength, out);
         out.println(); // blank line between headers and content, very important !
         out.flush(); // flush character output stream buffer
 

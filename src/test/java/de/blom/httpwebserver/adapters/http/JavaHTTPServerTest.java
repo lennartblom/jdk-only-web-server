@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -70,6 +72,7 @@ public class JavaHTTPServerTest {
         this.javaHTTPServer.handleMethodNotRequested(PUT, this.out, this.dataOut);
 
         verify(this.httpResponseOutput).writeResponseHeader(HttpStatus.SC_NOT_IMPLEMENTED, this.out);
+        verify(this.httpResponseOutput).writeResponseContentInformation(eq("text/html"), any(int.class), eq(this.out));
     }
 
     @Test
@@ -77,6 +80,7 @@ public class JavaHTTPServerTest {
         this.javaHTTPServer.handleFileNotFound(this.out, this.dataOut, DUMMY_FILE_REQUESTED);
 
         verify(this.httpResponseOutput).writeResponseHeader(HttpStatus.SC_NOT_FOUND, this.out);
+        verify(this.httpResponseOutput).writeResponseContentInformation(eq("text/html"), any(int.class), eq(this.out));
     }
 
 }
