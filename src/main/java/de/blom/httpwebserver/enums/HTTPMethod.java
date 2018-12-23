@@ -1,4 +1,4 @@
-package de.blom.httpwebserver;
+package de.blom.httpwebserver.enums;
 
 public enum HTTPMethod {
     GET,

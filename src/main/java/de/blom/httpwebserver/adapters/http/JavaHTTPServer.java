@@ -1,6 +1,6 @@
 package de.blom.httpwebserver.adapters.http;
 
-import de.blom.httpwebserver.HTTPMethod;
+import de.blom.httpwebserver.enums.HTTPMethod;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
