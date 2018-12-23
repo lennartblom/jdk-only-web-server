@@ -7,7 +7,11 @@ import java.util.Date;
 
 public class HTTPResponseOutput {
 
-    public void writeResponse(int httpStatus, PrintWriter out) {
+    public void writeResponseContent(String contentType, int fileLength, PrintWriter out){
+
+    }
+
+    public void writeResponseHeader(int httpStatus, PrintWriter out) {
         switch (httpStatus) {
             case HttpStatus.SC_NOT_FOUND:
                 this.write404Response(out);

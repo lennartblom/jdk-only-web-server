@@ -153,9 +153,7 @@ public class JavaHTTPServer implements Runnable{
         //read content to return to client
         byte[] fileData = readFileData(file, fileLength);
         // we send HTTP Headers with data to client
-        out.println("HTTP/1.1 501 Not Implemented");
-        out.println("Server: Java HTTP Server from SSaurel : 1.0");
-        out.println("Date: " + new Date());
+        this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_NOT_IMPLEMENTED, out);
         out.println("Content-type: " + contentMimeType);
         out.println("Content-length: " + fileLength);
         out.println(); // blank line between headers and content, very important !
@@ -174,7 +172,7 @@ public class JavaHTTPServer implements Runnable{
         if (HTTPMethod.GET.name().equals(method)) {
             byte[] fileData = readFileData(file, fileLength);
 
-            this.httpResponseOutput.writeResponse(HttpStatus.SC_OK, out);
+            this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_OK, out);
             out.println("Content-type: " + content);
             out.println("Content-length: " + fileLength);
             out.println(); // blank line between headers and content, very important !
@@ -225,7 +223,7 @@ public class JavaHTTPServer implements Runnable{
         String content = "text/html";
         byte[] fileData = readFileData(file, fileLength);
 
-        this.httpResponseOutput.writeResponse(HttpStatus.SC_NOT_FOUND, out);
+        this.httpResponseOutput.writeResponseHeader(HttpStatus.SC_NOT_FOUND, out);
         out.println("Content-type: " + content);
         out.println("Content-length: " + fileLength);
         out.println(); // blank line between headers and content, very important !

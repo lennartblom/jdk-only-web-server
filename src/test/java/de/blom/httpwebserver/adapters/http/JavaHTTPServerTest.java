@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.BufferedOutputStream;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,6 +41,7 @@ public class JavaHTTPServerTest {
     private static final String DUMMY_FILE_REQUESTED = "index.html";
 
     private static final String GET = "GET";
+    private static final String PUT = "PUT";
 
     @Before
     public void setup(){
@@ -63,14 +62,21 @@ public class JavaHTTPServerTest {
     public void expectToWrite200WhenFileRequestIsHandled() throws IOException {
         this.javaHTTPServer.handleFileRequest(DUMMY_FILE_REQUESTED, GET, this.out, this.dataOut);
 
-        verify(this.httpResponseOutput).writeResponse(HttpStatus.SC_OK, this.out);
+        verify(this.httpResponseOutput).writeResponseHeader(HttpStatus.SC_OK, this.out);
+    }
+
+    @Test
+    public void expectToWrite501WhenUnsupportedMethodHandled() throws IOException {
+        this.javaHTTPServer.handleMethodNotRequested(PUT, this.out, this.dataOut);
+
+        verify(this.httpResponseOutput).writeResponseHeader(HttpStatus.SC_NOT_IMPLEMENTED, this.out);
     }
 
     @Test
     public void expectToWrite404WhenNotFoundIsHandled() throws IOException {
         this.javaHTTPServer.handleFileNotFound(this.out, this.dataOut, DUMMY_FILE_REQUESTED);
 
-        verify(this.httpResponseOutput).writeResponse(HttpStatus.SC_NOT_FOUND, this.out);
+        verify(this.httpResponseOutput).writeResponseHeader(HttpStatus.SC_NOT_FOUND, this.out);
     }
 
 }
