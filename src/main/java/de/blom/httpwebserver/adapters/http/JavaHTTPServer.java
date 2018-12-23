@@ -125,14 +125,14 @@ public class JavaHTTPServer implements Runnable{
         return new StringTokenizer(input);
     }
 
-    private void closeElements(BufferedReader in, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+    void closeElements(BufferedReader in, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         in.close();
         out.close();
         dataOut.close();
         connect.close();
     }
 
-    private void handleMethodNotRequested(String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+    void handleMethodNotRequested(String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         if (verbose) {
             System.out.println("501 Not Implemented : " + method + " method.");
         }
@@ -156,7 +156,7 @@ public class JavaHTTPServer implements Runnable{
         dataOut.flush();
     }
 
-    private void handleFileRequest(String fileRequested, String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+    void handleFileRequest(String fileRequested, String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         System.out.println("File requested");
         File file = new File(WEB_ROOT, fileRequested);
         int fileLength = (int) file.length();
@@ -183,7 +183,7 @@ public class JavaHTTPServer implements Runnable{
         }
     }
 
-    private void handleDirectoryRequest() {
+    void handleDirectoryRequest() {
         System.out.println("Directory requested");
     }
 
@@ -203,7 +203,7 @@ public class JavaHTTPServer implements Runnable{
     }
 
     // return supported MIME Types
-    private String getContentType(String fileRequested) {
+    String getContentType(String fileRequested) {
         if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
             return "text/html";
         else
