@@ -1,4 +1,4 @@
 
 language: java
 
-  clean install test
+  clean install
