@@ -2,8 +2,10 @@ package de.blom.httpwebserver.adapters.http;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -13,6 +15,7 @@ import java.net.Socket;
 
 import static org.junit.Assert.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class JavaHTTPServerTest {
 
     private JavaHTTPServer javaHTTPServer;
@@ -42,7 +45,7 @@ public class JavaHTTPServerTest {
     public void expectToCloseElementsProperly() throws IOException {
 
 
-        this.javaHTTPServer.closeElements(in, out, dataOut);
+        this.javaHTTPServer.closeElements(this.in, this.out, this.dataOut);
 
         Mockito.verify(this.mockedSocket).close();
         Mockito.verify(this.in).close();
