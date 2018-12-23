@@ -1,6 +1,8 @@
 package de.blom.httpwebserver.adapters.http;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.BufferedOutputStream;
@@ -15,21 +17,44 @@ public class JavaHTTPServerTest {
 
     private JavaHTTPServer javaHTTPServer;
 
+    @Mock
+    private BufferedReader in;
+
+    @Mock
+    private PrintWriter out;
+
+    @Mock
+    private BufferedOutputStream dataOut;
+
+    @Mock
+    private Socket mockedSocket;
+
+    private static final String DUMMY_FILE_REQUESTED = "index.html";
+
+    private static final String GET = "GET";
+
+    @Before
+    public void setup(){
+        this.javaHTTPServer = new JavaHTTPServer(this.mockedSocket);
+    }
+
     @Test
     public void expectToCloseElementsProperly() throws IOException {
-        Socket mockedSocket = Mockito.mock(Socket.class);
-        this.javaHTTPServer = new JavaHTTPServer(mockedSocket);
 
-        BufferedReader in = Mockito.mock(BufferedReader.class);
-        PrintWriter out = Mockito.mock(PrintWriter.class);
-        BufferedOutputStream dataOut = Mockito.mock(BufferedOutputStream.class);
 
         this.javaHTTPServer.closeElements(in, out, dataOut);
 
-        Mockito.verify(mockedSocket).close();
-        Mockito.verify(in).close();
-        Mockito.verify(out).close();
-        Mockito.verify(dataOut).close();
+        Mockito.verify(this.mockedSocket).close();
+        Mockito.verify(this.in).close();
+        Mockito.verify(this.out).close();
+        Mockito.verify(this.dataOut).close();
+    }
+
+    @Test
+    public void expectToWrite200WhenFileRequestIsHandled() throws IOException {
+        this.javaHTTPServer.handleFileRequest(DUMMY_FILE_REQUESTED, GET, this.out, this.dataOut);
+
+
     }
 
 }
