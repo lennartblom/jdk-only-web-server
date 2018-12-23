@@ -32,7 +32,7 @@ public class HTTPResponseOutput {
     }
 
     void write501Response(PrintWriter out) {
-        out.println("HTTP/1.1 501sd Not Implemented");
+        out.println("HTTP/1.1 501 Not Implemented");
         writeServerAndDateInformation(out);
     }
 
