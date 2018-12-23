@@ -1,6 +1,7 @@
 package de.blom.httpwebserver.common;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -27,12 +28,16 @@ public class HTTPResponseOutputTest {
 
     private Date currentDate = new Date();
 
+    @Before
+    public void setup(){
+        when(this.httpResponseOutput.getCurrentDate()).thenReturn(this.currentDate);
+    }
+
     @Test
     public void expectToCall200Method() {
         this.httpResponseOutput.writeResponse(HttpStatus.SC_OK, this.out);
 
         verify(this.httpResponseOutput).write200Response(this.out);
-        when(this.httpResponseOutput.getCurrentDate()).thenReturn(this.currentDate);
     }
 
     @Test
