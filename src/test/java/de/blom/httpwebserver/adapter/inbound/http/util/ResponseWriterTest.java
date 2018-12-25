@@ -1,6 +1,6 @@
 package de.blom.httpwebserver.adapter.inbound.http.util;
 
-import de.blom.httpwebserver.domain.DirectoryRequestDto;
+import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;

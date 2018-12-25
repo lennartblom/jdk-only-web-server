@@ -1,9 +1,8 @@
-package de.blom.httpwebserver.domain;
+package de.blom.httpwebserver.domain.fileserver;
 
 import de.blom.httpwebserver.adapter.outbound.FileSystem;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

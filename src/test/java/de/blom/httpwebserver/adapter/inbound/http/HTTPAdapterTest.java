@@ -1,9 +1,8 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
-import de.blom.httpwebserver.domain.DirectoryRequestDto;
+import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.enums.HTTPMethod;
-import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +16,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Collections;
 
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
