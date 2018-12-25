@@ -1,11 +1,10 @@
-package de.blom.httpwebserver.domain;
+package de.blom.httpwebserver.domain.fileserver;
 
+import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mock;
 
-import java.net.Socket;
 import java.util.Arrays;
 import java.util.Collection;
 

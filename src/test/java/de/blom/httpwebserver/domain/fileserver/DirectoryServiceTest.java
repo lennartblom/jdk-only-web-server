@@ -1,6 +1,8 @@
-package de.blom.httpwebserver.domain;
+package de.blom.httpwebserver.domain.fileserver;
 
 import de.blom.httpwebserver.adapter.outbound.FileSystem;
+import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
