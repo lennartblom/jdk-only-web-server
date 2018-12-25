@@ -11,10 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class DirectoryRequestDto {
+    private Boolean found;
     private List<String> subdirectories;
     private List<String> files;
 
     public DirectoryRequestDto(){
+        this.found = false;
         this.subdirectories = new ArrayList<>();
         this.files = new ArrayList<>();
     }

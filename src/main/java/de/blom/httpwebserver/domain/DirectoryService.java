@@ -3,6 +3,7 @@ package de.blom.httpwebserver.domain;
 import de.blom.httpwebserver.adapter.outbound.FileSystem;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +30,9 @@ public class DirectoryService {
         }
         File[] directoryElements = directory.listFiles();
 
-        if(directoryElements == null){
+        if (directoryElements == null) {
             return new DirectoryRequestDto();
-        }else {
+        } else {
             File[] containedFiles = directoryElements;
 
             List<String> files = new ArrayList<>();
@@ -46,6 +47,7 @@ public class DirectoryService {
                 }
             }
             return DirectoryRequestDto.builder()
+                    .found(true)
                     .files(files)
                     .subdirectories(subdirectories)
                     .build();

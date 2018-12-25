@@ -2,6 +2,7 @@ package de.blom.httpwebserver.adapter.outbound;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class FileSystem {

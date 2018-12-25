@@ -11,8 +11,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -25,6 +23,7 @@ public class DirectoryServiceTest {
     private static final String SUBDIR_1 = "subdir1";
     private static final String SUBDIR_2 = "subdir2";
     private static final String DIRECTORY_PATH = "/";
+    private static final String EXAMPLE_FILE = "index.html";
 
     @Mock
     private FileSystem fileSystem;
@@ -35,15 +34,14 @@ public class DirectoryServiceTest {
     private DirectoryRequestDto expectedDirectoryInformation = DirectoryRequestDto.builder()
             .files(Arrays.asList(FILE_A, FILE_B, FILE_C))
             .subdirectories(Arrays.asList(SUBDIR_1, SUBDIR_2))
+            .found(true)
             .build();
-    private static final DirectoryRequestDto EXPECTED_EMPTY_DTO = DirectoryRequestDto.builder()
-            .files(Collections.EMPTY_LIST)
-            .subdirectories(Collections.EMPTY_LIST)
-            .build();
+
+    private static final DirectoryRequestDto EXPECTED_EMPTY_DTO = new DirectoryRequestDto();
 
 
     @Test
-    public void expectToReturnDirectoriesAndFiles(){
+    public void expectToReturnDirectoriesAndFiles() {
         File mockedDirectory = Mockito.mock(File.class);
         File mockedFile1 = Mockito.mock(File.class);
         File mockedFile2 = Mockito.mock(File.class);
@@ -86,7 +84,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void expectToReturnEmptyDtoIfDirectoryIsEmpty(){
+    public void expectToReturnEmptyDtoIfDirectoryIsEmpty() {
         File mockedDirectory = Mockito.mock(File.class);
         Mockito.when(mockedDirectory.listFiles()).thenReturn(null);
         Mockito.when(this.fileSystem.retrieveFile(DIRECTORY_PATH)).thenReturn(mockedDirectory);
@@ -97,8 +95,9 @@ public class DirectoryServiceTest {
         assertThat(returnedDirectoryRequestDto, Matchers.samePropertyValuesAs(EXPECTED_EMPTY_DTO));
 
     }
+
     @Test
-    public void expectToReturnEmptyDtoIfNullIsReturned(){
+    public void expectToReturnEmptyDtoIfNullIsReturned() {
         Mockito.when(this.fileSystem.retrieveFile(DIRECTORY_PATH)).thenReturn(null);
 
         DirectoryRequestDto returnedDirectoryRequestDto = this.directoryService.handleDirectoryRequest(DIRECTORY_PATH);

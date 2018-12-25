@@ -114,23 +114,26 @@ public class HTTPAdapter implements Runnable {
                     if (fileRequested.endsWith("/")) {
 
                         DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(fileRequested);
-                        this.handleDirectoryRequest(directoryRequestDto, out, dataOut);
-
+                        if(!directoryRequestDto.getFound()){
+                            this.responseWriter.respondeWith404(out, dataOut);
+                        }else {
+                            this.handleDirectoryRequest(directoryRequestDto, out, dataOut);
+                        }
                     }else {
                         FileRequestDto response = this.directoryService.handleFileRequest(fileRequested);
-                        this.responseWriter.writeHttpResponse(out, dataOut, response.getFileLength(), response.getContentType(), response.getFileContent(), HttpStatus.SC_OK);
+
+                        if(!response.getFound()){
+                            this.responseWriter.respondeWith404(out, dataOut);
+                        }else{
+                            this.responseWriter.writeHttpResponse(out, dataOut, response.getFileLength(), response.getContentType(), response.getFileContent(), HttpStatus.SC_OK);
+                        }
+
                     }
-
-
                     break;
                 default:
                     break;
             }
 
-
-        } catch (FileNotFoundException fileNotFoundException) {
-
-            // Todo FileNotFoundException
 
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);

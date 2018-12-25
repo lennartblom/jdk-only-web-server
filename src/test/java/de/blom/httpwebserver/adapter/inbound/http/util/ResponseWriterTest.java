@@ -54,12 +54,6 @@ public class ResponseWriterTest {
         verify(this.responseWriter).write200Response(this.out);
     }
 
-    @Test
-    public void expectToCall404Method() {
-        this.responseWriter.writeResponseHeader(HttpStatus.SC_NOT_FOUND, this.out);
-
-        verify(this.responseWriter).write404Response(this.out);
-    }
 
     @Test
     public void expectToCall501Method() {
@@ -82,15 +76,6 @@ public class ResponseWriterTest {
         this.responseWriter.write501Response(out);
 
         verify(this.out).println(eq("HTTP/1.1 501 Not Implemented"));
-        verify(this.out).println(eq(SERVER_INFO));
-        verify(this.out).println(eq("Date: " + this.currentDate));
-    }
-
-    @Test
-    public void expectToOutputCorrect404Status() {
-        this.responseWriter.write404Response(out);
-
-        verify(this.out).println(eq("HTTP/1.1 404 File Not Found"));
         verify(this.out).println(eq(SERVER_INFO));
         verify(this.out).println(eq("Date: " + this.currentDate));
     }
