@@ -80,7 +80,7 @@ public class HTTPAdapter implements Runnable {
         BufferedReader in = null;
         PrintWriter out = null;
         BufferedOutputStream dataOut = null;
-        String fileRequested = null;
+        String uri = null;
 
         try {
             // we read characters from the client via input stream on the socket
@@ -96,7 +96,7 @@ public class HTTPAdapter implements Runnable {
             StringTokenizer parse = new StringTokenizer(input);
             String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
             // we get file requested
-            fileRequested = parse.nextToken().toLowerCase();
+            uri = parse.nextToken().toLowerCase();
 
             /*
 
@@ -110,17 +110,16 @@ public class HTTPAdapter implements Runnable {
 
             switch (httpMethod) {
                 case GET:
-                case HEAD:
-                    if (fileRequested.endsWith("/")) {
+                    if (uri.endsWith("/")) {
 
-                        DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(fileRequested);
+                        DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(uri);
                         if(!directoryRequestDto.getFound()){
                             this.responseWriter.respondeWith404(out, dataOut);
                         }else {
                             this.handleDirectoryRequest(directoryRequestDto, out, dataOut);
                         }
                     }else {
-                        FileRequestDto response = this.directoryService.handleFileRequest(fileRequested);
+                        FileRequestDto response = this.directoryService.handleFileRequest(uri);
 
                         if(!response.getFound()){
                             this.responseWriter.respondeWith404(out, dataOut);
