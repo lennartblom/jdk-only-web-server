@@ -93,10 +93,12 @@ public class HTTPAdapter implements Runnable {
             // get first line of the request from the client
             String input = in.readLine();
             // we parse the request with a string tokenizer
-            StringTokenizer parse = new StringTokenizer(input);
-            String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
-            // we get file requested
-            uri = parse.nextToken().toLowerCase();
+            if (input != null) {
+
+                StringTokenizer parse = new StringTokenizer(input);
+                String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
+                // we get file requested
+                uri = parse.nextToken().toLowerCase();
 
             /*
 
@@ -106,33 +108,41 @@ public class HTTPAdapter implements Runnable {
 
              */
 
-            HTTPMethod httpMethod = this.identifyHTTPMethod(method);
+                HTTPMethod httpMethod = this.identifyHTTPMethod(method);
+                if (httpMethod == null) {
+                    this.responseWriter.respondeWith501(out, dataOut);
 
-            switch (httpMethod) {
-                case GET:
-                    if (uri.endsWith("/")) {
+                } else {
+                    switch (httpMethod) {
+                        case HEAD:
+                        case GET:
+                            if (uri.endsWith("/")) {
 
-                        DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(uri);
-                        if(!directoryRequestDto.getFound()){
-                            this.responseWriter.respondeWith404(out, dataOut);
-                        }else {
-                            this.handleDirectoryRequest(directoryRequestDto, out, dataOut);
-                        }
-                    }else {
-                        FileRequestDto response = this.directoryService.handleFileRequest(uri);
+                                DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(uri);
+                                if (!directoryRequestDto.getFound()) {
+                                    this.responseWriter.respondeWith404(out, dataOut);
+                                } else {
+                                    this.handleDirectoryRequest(directoryRequestDto, out, dataOut);
+                                }
+                            } else {
+                                FileRequestDto response = this.directoryService.handleFileRequest(uri);
 
-                        if(!response.getFound()){
-                            this.responseWriter.respondeWith404(out, dataOut);
-                        }else{
-                            this.responseWriter.writeHttpResponse(out, dataOut, response.getFileLength(), response.getContentType(), response.getFileContent(), HttpStatus.SC_OK);
-                        }
+                                if (!response.getFound()) {
+                                    this.responseWriter.respondeWith404(out, dataOut);
+                                } else {
+                                    this.responseWriter.writeHttpResponse(out, dataOut, response.getFileLength(), response.getContentType(), response.getFileContent(), HttpStatus.SC_OK);
+                                }
 
+                            }
+                            break;
+                        default:
+                            this.responseWriter.respondeWith501(out, dataOut);
+                            break;
                     }
-                    break;
-                default:
-                    break;
-            }
+                }
 
+
+            }
 
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);
@@ -151,7 +161,7 @@ public class HTTPAdapter implements Runnable {
 
     }
 
-    String handleHTTPMethod(HTTPMethod method){
+    String handleHTTPMethod(HTTPMethod method) {
         return null;
     }
 
