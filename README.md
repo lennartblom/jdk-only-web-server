@@ -15,7 +15,7 @@ In the future, logic implemented with this architectural approach could be used 
 a renewed way. The respective accesses to the used persistence layers are therefore reusable and 
 adapters (REST endpoint, message queue) do not contain closely coupled application logic.
 
-![](documentation/architecture.jpg)
+![](documentation/architecture.png)
 
 
 
