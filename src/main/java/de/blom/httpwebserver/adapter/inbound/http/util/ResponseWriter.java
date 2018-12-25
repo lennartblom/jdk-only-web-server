@@ -44,27 +44,27 @@ public class ResponseWriter {
         }
     }
 
-    public void writeHttpResponse(PrintWriter out, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
-        this.writeResponseHeader(statusCode, out);
-        this.writeResponseContentInformation(contentMimeType, fileLength, out);
-        out.println();
-        out.flush();
+    public void writeHttpResponse(PrintWriter httpResponseHead, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
+        this.writeResponseHeader(statusCode, httpResponseHead);
+        this.writeResponseContentInformation(contentMimeType, fileLength, httpResponseHead);
+        httpResponseHead.println();
+        httpResponseHead.flush();
         dataOut.write(fileData, 0, fileLength);
         dataOut.flush();
     }
 
-    void writeResponseHeader(int httpStatus, PrintWriter out) {
+    void writeResponseHeader(int httpStatus, PrintWriter httpResponseHead) {
         switch (httpStatus) {
             case HttpStatus.SC_NOT_FOUND:
-                this.write404Response(out);
+                this.write404Response(httpResponseHead);
                 break;
 
             case HttpStatus.SC_OK:
-                this.write200Response(out);
+                this.write200Response(httpResponseHead);
                 break;
 
             case HttpStatus.SC_NOT_IMPLEMENTED:
-                this.write501Response(out);
+                this.write501Response(httpResponseHead);
                 break;
 
             default:
@@ -73,9 +73,9 @@ public class ResponseWriter {
         }
     }
 
-    public void writeResponseContentInformation(String contentType, int fileLength, PrintWriter out) {
-        out.println("Content-type: " + contentType);
-        out.println("Content-length: " + fileLength);
+    public void writeResponseContentInformation(String contentType, int fileLength, PrintWriter httpResponseHead) {
+        httpResponseHead.println("Content-type: " + contentType);
+        httpResponseHead.println("Content-length: " + fileLength);
     }
 
     void write501Response(PrintWriter out) {
@@ -88,22 +88,22 @@ public class ResponseWriter {
         writeServerAndDateInformation(out);
     }
 
-    public void respondeWith404(PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(out, dataOut, FILE_NOT_FOUND_HTML.getBytes().length, "text/html", FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
+    public void respondeWith404(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
+        this.writeHttpResponse(httpResponseHead, dataOut, FILE_NOT_FOUND_HTML.getBytes().length, "text/html", FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
     }
 
-    public void respondeWith501(PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(out, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, "text/html", METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
+    public void respondeWith501(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
+        this.writeHttpResponse(httpResponseHead, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, "text/html", METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
     }
 
-    void write404Response(PrintWriter out) {
-        out.println("HTTP/1.1 404 File Not Found");
-        this.writeServerAndDateInformation(out);
+    void write404Response(PrintWriter httpResponseHead) {
+        httpResponseHead.println("HTTP/1.1 404 File Not Found");
+        this.writeServerAndDateInformation(httpResponseHead);
     }
 
-    private void writeServerAndDateInformation(PrintWriter out) {
-        out.println("Server: Java HTTP Server");
-        out.println("Date: " + this.getCurrentDate());
+    private void writeServerAndDateInformation(PrintWriter httpResponseHead) {
+        httpResponseHead.println("Server: Java HTTP Server");
+        httpResponseHead.println("Date: " + this.getCurrentDate());
     }
 
     Date getCurrentDate() {
