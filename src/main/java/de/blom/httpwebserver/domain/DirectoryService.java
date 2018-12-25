@@ -4,6 +4,9 @@ import de.blom.httpwebserver.adapter.outbound.FileSystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,6 +21,36 @@ public class DirectoryService {
 
     public DirectoryService() {
         this.filesystem = new FileSystem(WEB_ROOT_DIR);
+    }
+
+    public DirectoryRequestDto handleDirectoryRequest(String directoryPath){
+        File directory = this.filesystem.retrieveFile(directoryPath);
+        if(directory == null){
+            return new DirectoryRequestDto();
+        }
+        File[] directoryElements = directory.listFiles();
+
+        if(directoryElements == null){
+            return new DirectoryRequestDto();
+        }else {
+            File[] containedFiles = directoryElements;
+
+            List<String> files = new ArrayList<>();
+            List<String> subdirectories = new ArrayList<>();
+
+
+            for (File file : containedFiles) {
+                if(file.listFiles() != null){
+                    subdirectories.add(file.getName());
+                }else {
+                    files.add(file.getName());
+                }
+            }
+            return DirectoryRequestDto.builder()
+                    .files(files)
+                    .subdirectories(subdirectories)
+                    .build();
+        }
     }
 
     public FileRequestDto handleFileRequest(String retrieveFile) {

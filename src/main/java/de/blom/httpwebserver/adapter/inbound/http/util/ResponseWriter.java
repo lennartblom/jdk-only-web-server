@@ -27,7 +27,7 @@ public class ResponseWriter {
         dataOut.flush();
     }
 
-    public void writeResponseHeader(int httpStatus, PrintWriter out) {
+    void writeResponseHeader(int httpStatus, PrintWriter out) {
         switch (httpStatus) {
             case HttpStatus.SC_NOT_FOUND:
                 this.write404Response(out);

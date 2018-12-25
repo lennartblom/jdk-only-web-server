@@ -120,6 +120,8 @@ public class HTTPAdapter implements Runnable {
                 case GET:
                 case HEAD:
                     if (fileRequested.endsWith("/")) {
+
+                        this.directoryService.handleDirectoryRequest(fileRequested);
                         this.handleDirectoryRequest(fileRequested, method, out, dataOut);
                     }else {
                         FileRequestDto response = this.directoryService.handleFileRequest(fileRequested);
