@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.domain;
+package de.blom.httpwebserver.domain.fileserver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

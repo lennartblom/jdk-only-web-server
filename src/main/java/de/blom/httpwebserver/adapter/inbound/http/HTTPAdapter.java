@@ -1,9 +1,9 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
-import de.blom.httpwebserver.domain.DirectoryRequestDto;
-import de.blom.httpwebserver.domain.DirectoryService;
-import de.blom.httpwebserver.domain.FileRequestDto;
+import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.domain.fileserver.DirectoryService;
+import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
 import de.blom.httpwebserver.enums.HTTPMethod;
 import org.apache.commons.httpclient.HttpStatus;
 
@@ -20,13 +20,8 @@ public class HTTPAdapter implements Runnable {
     private static final Logger log = Logger.getLogger(HTTPAdapter.class.getName());
 
     private static final String DIR = "./dir";
-    private static final File WEB_ROOT = new File(DIR);
-    private static final String FILE_NOT_FOUND = "404.html";
-    private static final String METHOD_NOT_SUPPORTED = "not_supported.html";
     private static final int PORT = 8080;
     private static final boolean VERBOSE = true;
-    private static final String CONTENT_TYPE_TEXT_HTML = "text/html";
-    private static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
 
     private ResponseWriter responseWriter;
     private Socket connect;
