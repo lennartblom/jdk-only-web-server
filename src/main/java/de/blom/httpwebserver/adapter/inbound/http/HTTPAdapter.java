@@ -19,7 +19,6 @@ public class HTTPAdapter implements Runnable {
 
     private static final Logger log = Logger.getLogger(HTTPAdapter.class.getName());
 
-    private static final String DIR = "./dir";
     private static final int PORT = 8080;
     private static final boolean VERBOSE = true;
 
@@ -38,7 +37,6 @@ public class HTTPAdapter implements Runnable {
         this.responseWriter = responseWriter;
     }
 
-
     public static void main(String[] args) {
         try {
             ServerSocket serverConnect = new ServerSocket(PORT);
@@ -55,53 +53,25 @@ public class HTTPAdapter implements Runnable {
                 Thread thread = new Thread(myServer);
                 thread.start();
             }
-
         } catch (IOException e) {
             log.log(Level.SEVERE, "Server Connection error : " + e.getMessage(), e);
         }
     }
 
     public void run() {
-
-        /*
-
-        Copied from https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd
-
-        BEGIN
-
-         */
-
-        // we manage our particular client connection
-        BufferedReader in = null;
-        PrintWriter out = null;
-        BufferedOutputStream dataOut = null;
         String uri = null;
 
-        try {
-            // we read characters from the client via input stream on the socket
-            in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
-            // we get character output stream to client (for headers)
-            out = new PrintWriter(connect.getOutputStream());
-            // get binary output stream to client (for requested data)
-            dataOut = new BufferedOutputStream(connect.getOutputStream());
-
-            // get first line of the request from the client
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
+             PrintWriter out = new PrintWriter(connect.getOutputStream());
+             BufferedOutputStream dataOut = new BufferedOutputStream(connect.getOutputStream())
+        ) {
             String input = in.readLine();
-            // we parse the request with a string tokenizer
             if (input != null) {
 
                 StringTokenizer parse = new StringTokenizer(input);
-                String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
-                // we get file requested
+                String method = parse.nextToken().toUpperCase();
                 uri = parse.nextToken().toLowerCase();
 
-            /*
-
-            Copied from https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd
-
-            END
-
-             */
 
                 HTTPMethod httpMethod = this.identifyHTTPMethod(method);
                 if (httpMethod == null) {
@@ -162,12 +132,6 @@ public class HTTPAdapter implements Runnable {
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);
         } finally {
-            try {
-                this.closeElements(in, out, dataOut);
-            } catch (Exception e) {
-                log.log(Level.SEVERE, "Error closing stream : " + e.getMessage(), e);
-            }
-
             if (VERBOSE) {
                 log.info("Connection closed.\n");
             }
@@ -200,12 +164,5 @@ public class HTTPAdapter implements Runnable {
         this.responseWriter.writeHttpResponse(directoryInformation, out, dataOut);
     }
 
-
-    void closeElements(BufferedReader in, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        in.close();
-        out.close();
-        dataOut.close();
-        connect.close();
-    }
 
 }
