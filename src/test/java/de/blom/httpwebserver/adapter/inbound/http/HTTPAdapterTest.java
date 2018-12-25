@@ -71,28 +71,6 @@ public class HTTPAdapterTest {
         verify(this.dataOut).close();
     }
 
-    @Test
-    public void expectToWrite200WhenFileRequestIsHandled() throws IOException {
-        this.httpAdapter.handleFileRequest(DUMMY_FILE_REQUESTED, GET, this.out, this.dataOut);
-
-        verify(this.responseWriter).writeHttpResponse(eq(this.out), eq(this.dataOut), any(int.class), any(String.class), any(byte[].class), eq(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void expectToWrite501WhenUnsupportedMethodHandled() throws IOException {
-        this.httpAdapter.handleMethodNotRequested(PUT, this.out, this.dataOut);
-
-
-        verify(this.responseWriter).writeHttpResponse(eq(this.out), eq(this.dataOut), any(int.class), any(String.class), any(byte[].class), eq(HttpStatus.SC_NOT_IMPLEMENTED));
-    }
-
-    @Test
-    public void expectToWrite404WhenNotFoundIsHandled() throws IOException {
-        this.httpAdapter.handleFileNotFound(this.out, this.dataOut, DUMMY_FILE_REQUESTED);
-
-        verify(this.responseWriter).writeHttpResponse(eq(this.out), eq(this.dataOut), any(int.class), any(String.class), any(byte[].class), eq(HttpStatus.SC_NOT_FOUND));
-    }
-
     @Test(expected = IOException.class)
     public void expectToHandleNullpointer() throws IOException {
         when(this.in.readLine()).thenReturn(null);

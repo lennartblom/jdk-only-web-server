@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.adapter.inbound.http;
+package de.blom.httpwebserver.domain;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,15 +10,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
-public class JavaHTTPServerContentTypeTest {
+public class DirectoryServiceContentTypeTest {
 
-    private HTTPAdapter HTTPAdapter;
-
-    @Mock
-    private Socket connection;
+    private DirectoryService directoryService;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
@@ -33,15 +30,16 @@ public class JavaHTTPServerContentTypeTest {
 
     private String expectedContentType;
 
-    public JavaHTTPServerContentTypeTest(String fileName, String expected) {
+    public DirectoryServiceContentTypeTest(String fileName, String expected) {
         this.fileName = fileName;
         this.expectedContentType = expected;
 
-        this.HTTPAdapter = new HTTPAdapter(connection);
+        this.directoryService = new DirectoryService();
     }
 
     @Test
     public void test() {
-        assertThat(this.HTTPAdapter.getContentType(this.fileName), is(expectedContentType));
+        assertThat(this.directoryService.getContentType(this.fileName), is(expectedContentType));
     }
+
 }

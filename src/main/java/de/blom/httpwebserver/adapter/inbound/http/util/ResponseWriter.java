@@ -8,8 +8,12 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.List;
 
 public class ResponseWriter {
+
+    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li><a href=\"%s/\">%s/</a></li>";
+    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li><a href=\"%s\">%s</a></li>";
 
     public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         int fileLength = fileRequestDto.getFileLength();
@@ -20,18 +24,22 @@ public class ResponseWriter {
 
     public void writeHttpResponse(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
 
-        String htmlDirectoryHtmlList = "<ul>";
-        for (String subdirectory: directoryRequestDto.getSubdirectories()) {
-            htmlDirectoryHtmlList = htmlDirectoryHtmlList + "<li><a href=\"" + subdirectory + "/\">" + subdirectory + "/</a></li>";
+        StringBuilder htmlDirectoryHtmlList = new StringBuilder("<ul>");
+
+        this.createListEntriesForDirectoryElements(htmlDirectoryHtmlList, directoryRequestDto.getSubdirectories(), DIRECTORY_LIST_ENTRY_TEMPLATE);
+        this.createListEntriesForDirectoryElements(htmlDirectoryHtmlList, directoryRequestDto.getFiles(), FILE_LIST_ENTRY_TEMPLATE);
+
+        htmlDirectoryHtmlList.append("</ul>");
+
+        this.writeHttpResponse(out, dataOut, htmlDirectoryHtmlList.toString().getBytes().length, "text/html", htmlDirectoryHtmlList.toString().getBytes(), HttpStatus.SC_OK);
+
+    }
+
+    private void createListEntriesForDirectoryElements(StringBuilder htmlDirectoryHtmlList, List<String> subdirectories, String directoryListEntryTemplate) {
+        for (String subdirectory : subdirectories) {
+            String subdirectoryListEntry = String.format(directoryListEntryTemplate, subdirectory, subdirectory);
+            htmlDirectoryHtmlList.append(subdirectoryListEntry);
         }
-        for (String file: directoryRequestDto.getFiles()) {
-            htmlDirectoryHtmlList = htmlDirectoryHtmlList + "<li><a href=\"" + file + "\">" + file + "</a></li>";
-        }
-
-        htmlDirectoryHtmlList = htmlDirectoryHtmlList + "</ul>";
-
-        this.writeHttpResponse(out, dataOut, htmlDirectoryHtmlList.getBytes().length, "text/html", htmlDirectoryHtmlList.getBytes(), HttpStatus.SC_OK);
-
     }
 
     public void writeHttpResponse(PrintWriter out, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {

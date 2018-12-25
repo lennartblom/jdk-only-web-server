@@ -2,24 +2,15 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
 import de.blom.httpwebserver.domain.DirectoryRequestDto;
-import de.blom.httpwebserver.domain.FileRequestDto;
 import de.blom.httpwebserver.domain.DirectoryService;
+import de.blom.httpwebserver.domain.FileRequestDto;
 import de.blom.httpwebserver.enums.HTTPMethod;
 import org.apache.commons.httpclient.HttpStatus;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +53,7 @@ public class HTTPAdapter implements Runnable {
                 HTTPAdapter myServer = new HTTPAdapter(serverConnect.accept());
 
                 if (VERBOSE) {
-                    log.info("Connecton opened. (" + new Date() + ")");
+                    log.info("Connection opened. (" + new Date() + ")");
                 }
 
                 // create dedicated thread to manage the client connection
@@ -137,25 +128,9 @@ public class HTTPAdapter implements Runnable {
             }
 
 
-/*
-            if (!HTTPMethod.GET.name().equals(method) && !HTTPMethod.HEAD.name().equals(method)) {
-                this.handleMethodNotRequested(method, out, dataOut);
-
-            } else {
-                if (fileRequested.endsWith("/")) {
-                    this.handleDirectoryRequest(fileRequested, method, out, dataOut);
-                }else {
-                    this.handleFileRequest(fileRequested, method, out, dataOut);
-                }
-            }*/
-
         } catch (FileNotFoundException fileNotFoundException) {
-            try {
-                this.handleFileNotFound(out, dataOut, fileRequested);
-            } catch (IOException ioException) {
 
-                log.log(Level.SEVERE, "Error with file not found exception : " + ioException.getMessage(), ioException);
-            }
+            // Todo FileNotFoundException
 
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);
@@ -197,88 +172,17 @@ public class HTTPAdapter implements Runnable {
 
     }
 
-    void closeElements(BufferedReader in, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        in.close();
-        out.close();
-        dataOut.close();
-        connect.close();
-    }
-
-    void handleMethodNotRequested(String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        if (VERBOSE) {
-            log.info("501 Not Implemented : " + method + " method.");
-        }
-
-
-        File file = this.retrieveFile(METHOD_NOT_SUPPORTED);
-        int fileLength = (int) file.length();
-
-        byte[] fileData = readFileData(file, fileLength);
-        this.responseWriter.writeHttpResponse(out, dataOut, fileLength, CONTENT_TYPE_TEXT_HTML, fileData, HttpStatus.SC_NOT_IMPLEMENTED);
-    }
-
-    void handleFileRequest(String fileRequested, String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        log.info("File requested");
-        File file = this.retrieveFile(fileRequested);
-        int fileLength = (int) file.length();
-        String content = this.getContentType(fileRequested);
-
-        if (HTTPMethod.GET.name().equals(method)) {
-            byte[] fileData = readFileData(file, fileLength);
-
-            this.responseWriter.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_OK);
-        }
-
-        if (VERBOSE) {
-            log.info("File " + fileRequested + " of type " + content + " returned");
-        }
-    }
-
     void handleDirectoryRequest(DirectoryRequestDto directoryInformation, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         log.info("Directory requested");
         this.responseWriter.writeHttpResponse(directoryInformation, out, dataOut);
     }
 
-    private byte[] readFileData(File file, int fileLength) throws IOException {
-        FileInputStream fileIn = null;
-        byte[] fileData = new byte[fileLength];
 
-        try {
-            fileIn = new FileInputStream(file);
-            fileIn.read(fileData);
-        } finally {
-            if (fileIn != null)
-                fileIn.close();
-        }
-
-        return fileData;
-    }
-
-
-    void handleFileNotFound(PrintWriter out, BufferedOutputStream dataOut, String fileRequested) throws IOException {
-        File file = this.retrieveFile(FILE_NOT_FOUND);
-        int fileLength = (int) file.length();
-        String content = CONTENT_TYPE_TEXT_HTML;
-        byte[] fileData = readFileData(file, fileLength);
-
-        this.responseWriter.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_NOT_FOUND);
-
-        if (VERBOSE) {
-            log.info("File " + fileRequested + " not found");
-        }
-    }
-
-
-    private File retrieveFile(String fileRequested) {
-        return new File(WEB_ROOT, fileRequested);
-    }
-
-
-    String getContentType(String fileRequested) {
-        if (fileRequested.endsWith(".htm") || fileRequested.endsWith(".html"))
-            return CONTENT_TYPE_TEXT_HTML;
-        else
-            return CONTENT_TYPE_TEXT_PLAIN;
+    void closeElements(BufferedReader in, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+        in.close();
+        out.close();
+        dataOut.close();
+        connect.close();
     }
 
 }
