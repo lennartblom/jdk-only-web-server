@@ -1,5 +1,6 @@
 package de.blom.httpwebserver.adapter.inbound.http.util;
 
+import de.blom.httpwebserver.domain.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.FileRequestDto;
 import org.apache.commons.httpclient.HttpStatus;
 
@@ -10,12 +11,27 @@ import java.util.Date;
 
 public class ResponseWriter {
 
-
     public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         int fileLength = fileRequestDto.getFileLength();
         String contentType = fileRequestDto.getContentType();
         byte[] fileContent = fileRequestDto.getFileContent();
         this.writeHttpResponse(out, dataOut, fileLength, contentType, fileContent, HttpStatus.SC_OK);
+    }
+
+    public void writeHttpResponse(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+
+        String htmlDirectoryHtmlList = "<ul>";
+        for (String subdirectory: directoryRequestDto.getSubdirectories()) {
+            htmlDirectoryHtmlList = htmlDirectoryHtmlList + "<li><a href=\"" + subdirectory + "/\">" + subdirectory + "/</a></li>";
+        }
+        for (String file: directoryRequestDto.getFiles()) {
+            htmlDirectoryHtmlList = htmlDirectoryHtmlList + "<li><a href=\"" + file + "\">" + file + "</a></li>";
+        }
+
+        htmlDirectoryHtmlList = htmlDirectoryHtmlList + "</ul>";
+
+        this.writeHttpResponse(out, dataOut, htmlDirectoryHtmlList.getBytes().length, "text/html", htmlDirectoryHtmlList.getBytes(), HttpStatus.SC_OK);
+
     }
 
     public void writeHttpResponse(PrintWriter out, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {

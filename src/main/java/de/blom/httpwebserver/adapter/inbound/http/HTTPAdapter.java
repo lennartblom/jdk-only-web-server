@@ -1,6 +1,7 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
+import de.blom.httpwebserver.domain.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.FileRequestDto;
 import de.blom.httpwebserver.domain.DirectoryService;
 import de.blom.httpwebserver.enums.HTTPMethod;
@@ -121,8 +122,9 @@ public class HTTPAdapter implements Runnable {
                 case HEAD:
                     if (fileRequested.endsWith("/")) {
 
-                        this.directoryService.handleDirectoryRequest(fileRequested);
-                        this.handleDirectoryRequest(fileRequested, method, out, dataOut);
+                        DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(fileRequested);
+                        this.handleDirectoryRequest(directoryRequestDto, out, dataOut);
+
                     }else {
                         FileRequestDto response = this.directoryService.handleFileRequest(fileRequested);
                         this.responseWriter.writeHttpResponse(out, dataOut, response.getFileLength(), response.getContentType(), response.getFileContent(), HttpStatus.SC_OK);
@@ -232,23 +234,9 @@ public class HTTPAdapter implements Runnable {
         }
     }
 
-    void handleDirectoryRequest(String fileRequested, String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+    void handleDirectoryRequest(DirectoryRequestDto directoryInformation, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         log.info("Directory requested");
-
-        File folder = new File(WEB_ROOT, fileRequested);
-        File[] files = folder.listFiles();
-        List<File> elements = Arrays.asList(folder.listFiles());
-
-        String htmlDirectoryList = "<ul>";
-        for (File file : files) {
-            String filename = file.toString();
-            filename = filename.replace(DIR + "//", "");
-            htmlDirectoryList = htmlDirectoryList + "<li><a href=\"" + filename + "\">" + filename + "</a></li>";
-        }
-        htmlDirectoryList = htmlDirectoryList + "</ul>";
-
-        this.responseWriter.writeHttpResponse(out, dataOut, htmlDirectoryList.getBytes().length, CONTENT_TYPE_TEXT_HTML, htmlDirectoryList.getBytes(), HttpStatus.SC_OK);
-
+        this.responseWriter.writeHttpResponse(directoryInformation, out, dataOut);
     }
 
     private byte[] readFileData(File file, int fileLength) throws IOException {

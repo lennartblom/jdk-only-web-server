@@ -1,5 +1,6 @@
 package de.blom.httpwebserver.adapter.inbound.http.util;
 
+import de.blom.httpwebserver.domain.DirectoryRequestDto;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Date;
 
 import static org.mockito.Matchers.eq;
@@ -23,7 +25,7 @@ public class ResponseWriterTest {
 
     private static final byte[] FILE_DATA = new byte[52];
     private static final int STATUS_CODE = HttpStatus.SC_OK;
-    private static final String MIME_TYPE = "text/html";
+    private static final String CONTENT_TYPE_HTML = "text/html";
 
     private static final String SERVER_INFO = "Server: Java HTTP Server";
     private static final String TEXT_HTML = "text/html";
@@ -102,15 +104,30 @@ public class ResponseWriterTest {
 
     @Test
     public void expectToReturnValidHttpResponse() throws IOException {
-        this.responseWriter.writeHttpResponse(this.out, this.dataOut, FILE_LENGTH, MIME_TYPE, FILE_DATA, STATUS_CODE);
+        this.responseWriter.writeHttpResponse(this.out, this.dataOut, FILE_LENGTH, CONTENT_TYPE_HTML, FILE_DATA, STATUS_CODE);
 
         verify(this.responseWriter).writeResponseHeader(STATUS_CODE, this.out);
-        verify(this.responseWriter).writeResponseContentInformation(MIME_TYPE, FILE_LENGTH, this.out);
+        verify(this.responseWriter).writeResponseContentInformation(CONTENT_TYPE_HTML, FILE_LENGTH, this.out);
 
         verify(this.out).flush();
 
         verify(this.dataOut).write(FILE_DATA, 0, FILE_LENGTH);
         verify(this.dataOut).flush();
+    }
+
+    @Test
+    public void expectToWriteProperDirectoryHtmlList() throws IOException {
+        DirectoryRequestDto directoryRequestDto = DirectoryRequestDto.builder()
+                .files(Collections.singletonList("index.html"))
+                .subdirectories(Collections.singletonList("subdirectory"))
+                .build();
+
+        String expectedHTML = "<ul><li><a href=\"subdirectory/\">subdirectory/</a></li><li><a href=\"index.html\">index.html</a></li></ul>";
+
+        this.responseWriter.writeHttpResponse(directoryRequestDto, this.out, this.dataOut);
+
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, expectedHTML.getBytes().length, CONTENT_TYPE_HTML, expectedHTML.getBytes(), HttpStatus.SC_OK);
+
     }
 
 

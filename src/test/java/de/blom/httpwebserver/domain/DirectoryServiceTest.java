@@ -91,6 +91,7 @@ public class DirectoryServiceTest {
         Mockito.when(mockedDirectory.listFiles()).thenReturn(null);
         Mockito.when(this.fileSystem.retrieveFile(DIRECTORY_PATH)).thenReturn(mockedDirectory);
 
+
         DirectoryRequestDto returnedDirectoryRequestDto = this.directoryService.handleDirectoryRequest(DIRECTORY_PATH);
 
         assertThat(returnedDirectoryRequestDto, Matchers.samePropertyValuesAs(EXPECTED_EMPTY_DTO));
