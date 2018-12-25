@@ -58,16 +58,6 @@ public class HTTPAdapterTest {
         this.httpAdapter = new HTTPAdapter(this.mockedSocket, this.responseWriter);
     }
 
-    @Test
-    public void expectToCloseElementsProperly() throws IOException {
-        this.httpAdapter.closeElements(this.in, this.out, this.dataOut);
-
-        verify(this.mockedSocket).close();
-        verify(this.in).close();
-        verify(this.out).close();
-        verify(this.dataOut).close();
-    }
-
     @Test(expected = IOException.class)
     public void expectToHandleNullpointer() throws IOException {
         when(this.in.readLine()).thenReturn(null);
