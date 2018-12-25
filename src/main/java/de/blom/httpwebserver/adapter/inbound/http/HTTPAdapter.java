@@ -109,6 +109,26 @@ public class HTTPAdapter implements Runnable {
 
                 } else {
                     switch (httpMethod) {
+                        case POST:
+
+                            log.info("POST uri='" + uri + "'");
+                            switch (uri) {
+                                case "/comments":
+                                case "/comments/":
+                                    log.info("Comment creation");
+                                    break;
+
+                                case "/comments/query":
+                                case "/comments/query/":
+                                    log.info("Comment retrievement");
+                                    break;
+
+                                default:
+
+                                    break;
+                            }
+
+                            break;
                         case HEAD:
                         case GET:
                             if (uri.endsWith("/")) {
