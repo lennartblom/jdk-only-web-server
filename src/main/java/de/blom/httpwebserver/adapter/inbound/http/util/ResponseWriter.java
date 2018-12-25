@@ -1,11 +1,32 @@
-package de.blom.httpwebserver.common;
+package de.blom.httpwebserver.adapter.inbound.http.util;
 
+import de.blom.httpwebserver.domain.FileRequestDto;
 import org.apache.commons.httpclient.HttpStatus;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 
-public class HTTPResponseOutput {
+public class ResponseWriter {
+
+
+    public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+        int fileLength = fileRequestDto.getFileLength();
+        String contentType = fileRequestDto.getContentType();
+        byte[] fileContent = fileRequestDto.getFileContent();
+        this.writeHttpResponse(out, dataOut, fileLength, contentType, fileContent, HttpStatus.SC_OK);
+    }
+
+    public void writeHttpResponse(PrintWriter out, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
+        this.writeResponseHeader(statusCode, out);
+        this.writeResponseContentInformation(contentMimeType, fileLength, out);
+        out.println();
+        out.flush();
+        dataOut.write(fileData, 0, fileLength);
+        dataOut.flush();
+    }
+
     public void writeResponseHeader(int httpStatus, PrintWriter out) {
         switch (httpStatus) {
             case HttpStatus.SC_NOT_FOUND:
@@ -41,7 +62,6 @@ public class HTTPResponseOutput {
         writeServerAndDateInformation(out);
 
     }
-
 
     void write404Response(PrintWriter out) {
         out.println("HTTP/1.1 404 File Not Found");

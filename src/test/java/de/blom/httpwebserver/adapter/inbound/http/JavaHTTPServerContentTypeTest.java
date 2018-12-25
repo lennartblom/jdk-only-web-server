@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.adapters.http;
+package de.blom.httpwebserver.adapter.inbound.http;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class JavaHTTPServerContentTypeTest {
 
-    private JavaHTTPServer javaHTTPServer;
+    private HTTPAdapter HTTPAdapter;
 
     @Mock
     private Socket connection;
@@ -37,11 +37,11 @@ public class JavaHTTPServerContentTypeTest {
         this.fileName = fileName;
         this.expectedContentType = expected;
 
-        this.javaHTTPServer = new JavaHTTPServer(connection);
+        this.HTTPAdapter = new HTTPAdapter(connection);
     }
 
     @Test
     public void test() {
-        assertThat(this.javaHTTPServer.getContentType(this.fileName), is(expectedContentType));
+        assertThat(this.HTTPAdapter.getContentType(this.fileName), is(expectedContentType));
     }
 }

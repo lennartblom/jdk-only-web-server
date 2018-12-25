@@ -1,6 +1,8 @@
-package de.blom.httpwebserver.adapters.http;
+package de.blom.httpwebserver.adapter.inbound.http;
 
-import de.blom.httpwebserver.common.HTTPResponseOutput;
+import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
+import de.blom.httpwebserver.domain.FileRequestDto;
+import de.blom.httpwebserver.domain.DirectoryService;
 import de.blom.httpwebserver.enums.HTTPMethod;
 import org.apache.commons.httpclient.HttpStatus;
 
@@ -14,33 +16,39 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class JavaHTTPServer implements Runnable {
+public class HTTPAdapter implements Runnable {
 
-    private static final Logger log = Logger.getLogger(JavaHTTPServer.class.getName());
+    private static final Logger log = Logger.getLogger(HTTPAdapter.class.getName());
 
-    private static final File WEB_ROOT = new File("./dir/");
+    private static final String DIR = "./dir";
+    private static final File WEB_ROOT = new File(DIR);
     private static final String FILE_NOT_FOUND = "404.html";
     private static final String METHOD_NOT_SUPPORTED = "not_supported.html";
     private static final int PORT = 8080;
     private static final boolean VERBOSE = true;
     private static final String CONTENT_TYPE_TEXT_HTML = "text/html";
+    private static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
 
-    private HTTPResponseOutput httpResponseOutput;
+    private ResponseWriter responseWriter;
     private Socket connect;
+    private DirectoryService directoryService;
 
-    JavaHTTPServer(Socket c) {
-        this.httpResponseOutput = new HTTPResponseOutput();
+    HTTPAdapter(Socket c) {
+        this.responseWriter = new ResponseWriter();
         this.connect = c;
+        this.directoryService = new DirectoryService();
     }
 
-    JavaHTTPServer(Socket c, HTTPResponseOutput httpResponseOutput) {
+    HTTPAdapter(Socket c, ResponseWriter responseWriter) {
         this(c);
-        this.httpResponseOutput = httpResponseOutput;
+        this.responseWriter = responseWriter;
     }
 
 
@@ -50,7 +58,7 @@ public class JavaHTTPServer implements Runnable {
             log.info("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
             while (true) {
-                JavaHTTPServer myServer = new JavaHTTPServer(serverConnect.accept());
+                HTTPAdapter myServer = new HTTPAdapter(serverConnect.accept());
 
                 if (VERBOSE) {
                     log.info("Connecton opened. (" + new Date() + ")");
@@ -67,34 +75,75 @@ public class JavaHTTPServer implements Runnable {
     }
 
     public void run() {
+
+        /*
+
+        Copied from https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd
+
+        BEGIN
+
+         */
+
+        // we manage our particular client connection
         BufferedReader in = null;
         PrintWriter out = null;
         BufferedOutputStream dataOut = null;
         String fileRequested = null;
-        String method;
 
         try {
+            // we read characters from the client via input stream on the socket
             in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
+            // we get character output stream to client (for headers)
             out = new PrintWriter(connect.getOutputStream());
-
+            // get binary output stream to client (for requested data)
             dataOut = new BufferedOutputStream(connect.getOutputStream());
-            StringTokenizer parse = this.parseInput(in);
 
-            method = this.getHttpMethod(parse);
-            fileRequested = this.getRequestedFile(parse);
+            // get first line of the request from the client
+            String input = in.readLine();
+            // we parse the request with a string tokenizer
+            StringTokenizer parse = new StringTokenizer(input);
+            String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
+            // we get file requested
+            fileRequested = parse.nextToken().toLowerCase();
+
+            /*
+
+            Copied from https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd
+
+            END
+
+             */
+
+            HTTPMethod httpMethod = this.identifyHTTPMethod(method);
+
+            switch (httpMethod) {
+                case GET:
+                case HEAD:
+                    if (fileRequested.endsWith("/")) {
+                        this.handleDirectoryRequest(fileRequested, method, out, dataOut);
+                    }else {
+                        FileRequestDto response = this.directoryService.handleFileRequest(fileRequested);
+                        this.responseWriter.writeHttpResponse(out, dataOut, response.getFileLength(), response.getContentType(), response.getFileContent(), HttpStatus.SC_OK);
+                    }
 
 
+                    break;
+                default:
+                    break;
+            }
+
+
+/*
             if (!HTTPMethod.GET.name().equals(method) && !HTTPMethod.HEAD.name().equals(method)) {
                 this.handleMethodNotRequested(method, out, dataOut);
 
             } else {
                 if (fileRequested.endsWith("/")) {
-                    this.handleDirectoryRequest();
+                    this.handleDirectoryRequest(fileRequested, method, out, dataOut);
+                }else {
+                    this.handleFileRequest(fileRequested, method, out, dataOut);
                 }
-
-                this.handleFileRequest(fileRequested, method, out, dataOut);
-
-            }
+            }*/
 
         } catch (FileNotFoundException fileNotFoundException) {
             try {
@@ -121,21 +170,17 @@ public class JavaHTTPServer implements Runnable {
 
     }
 
-    void writeHttpResponse(PrintWriter out, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
-        this.httpResponseOutput.writeResponseHeader(statusCode, out);
-        this.httpResponseOutput.writeResponseContentInformation(contentMimeType, fileLength, out);
-        out.println();
-        out.flush();
-        dataOut.write(fileData, 0, fileLength);
-        dataOut.flush();
+    String handleHTTPMethod(HTTPMethod method){
+        return null;
     }
 
-    private String getRequestedFile(StringTokenizer parse) {
-        return parse.nextToken().toLowerCase();
-    }
-
-    private String getHttpMethod(StringTokenizer parse) {
-        return parse.nextToken().toUpperCase();
+    HTTPMethod identifyHTTPMethod(String method) {
+        method = method.toUpperCase();
+        try {
+            return HTTPMethod.valueOf(method);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     StringTokenizer parseInput(BufferedReader in) throws IOException {
@@ -165,28 +210,43 @@ public class JavaHTTPServer implements Runnable {
         int fileLength = (int) file.length();
 
         byte[] fileData = readFileData(file, fileLength);
-        this.writeHttpResponse(out, dataOut, fileLength, CONTENT_TYPE_TEXT_HTML, fileData, HttpStatus.SC_NOT_IMPLEMENTED);
+        this.responseWriter.writeHttpResponse(out, dataOut, fileLength, CONTENT_TYPE_TEXT_HTML, fileData, HttpStatus.SC_NOT_IMPLEMENTED);
     }
 
     void handleFileRequest(String fileRequested, String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        System.out.println("File requested");
+        log.info("File requested");
         File file = this.retrieveFile(fileRequested);
         int fileLength = (int) file.length();
-        String content = getContentType(fileRequested);
+        String content = this.getContentType(fileRequested);
 
         if (HTTPMethod.GET.name().equals(method)) {
             byte[] fileData = readFileData(file, fileLength);
 
-            this.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_OK);
+            this.responseWriter.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_OK);
         }
 
         if (VERBOSE) {
-            System.out.println("File " + fileRequested + " of type " + content + " returned");
+            log.info("File " + fileRequested + " of type " + content + " returned");
         }
     }
 
-    void handleDirectoryRequest() {
+    void handleDirectoryRequest(String fileRequested, String method, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         log.info("Directory requested");
+
+        File folder = new File(WEB_ROOT, fileRequested);
+        File[] files = folder.listFiles();
+        List<File> elements = Arrays.asList(folder.listFiles());
+
+        String htmlDirectoryList = "<ul>";
+        for (File file : files) {
+            String filename = file.toString();
+            filename = filename.replace(DIR + "//", "");
+            htmlDirectoryList = htmlDirectoryList + "<li><a href=\"" + filename + "\">" + filename + "</a></li>";
+        }
+        htmlDirectoryList = htmlDirectoryList + "</ul>";
+
+        this.responseWriter.writeHttpResponse(out, dataOut, htmlDirectoryList.getBytes().length, CONTENT_TYPE_TEXT_HTML, htmlDirectoryList.getBytes(), HttpStatus.SC_OK);
+
     }
 
     private byte[] readFileData(File file, int fileLength) throws IOException {
@@ -211,7 +271,7 @@ public class JavaHTTPServer implements Runnable {
         String content = CONTENT_TYPE_TEXT_HTML;
         byte[] fileData = readFileData(file, fileLength);
 
-        this.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_NOT_FOUND);
+        this.responseWriter.writeHttpResponse(out, dataOut, fileLength, content, fileData, HttpStatus.SC_NOT_FOUND);
 
         if (VERBOSE) {
             log.info("File " + fileRequested + " not found");
@@ -228,7 +288,7 @@ public class JavaHTTPServer implements Runnable {
         if (fileRequested.endsWith(".htm") || fileRequested.endsWith(".html"))
             return CONTENT_TYPE_TEXT_HTML;
         else
-            return "text/plain";
+            return CONTENT_TYPE_TEXT_PLAIN;
     }
 
 }
