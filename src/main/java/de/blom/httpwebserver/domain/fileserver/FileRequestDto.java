@@ -17,6 +17,5 @@ public class FileRequestDto {
 
     FileRequestDto(Boolean found){
         this.found = found;
-
     }
 }
