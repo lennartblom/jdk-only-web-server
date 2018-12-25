@@ -161,10 +161,6 @@ public class HTTPAdapter implements Runnable {
 
     }
 
-    String handleHTTPMethod(HTTPMethod method) {
-        return null;
-    }
-
     HTTPMethod identifyHTTPMethod(String method) {
         method = method.toUpperCase();
         try {
