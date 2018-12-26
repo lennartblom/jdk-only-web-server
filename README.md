@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/lennartblom/http-content-delivery-server.svg?branch=master)](https://travis-ci.org/lennartblom/http-content-delivery-server)
 
 
-### Architecture concept
+**Architectural approach**
 
 The basic approach of the application is a HTTP server 
 written without additional frameworks and using only the standard JDK.
@@ -17,6 +17,12 @@ adapters (REST endpoint, message queue) do not contain closely coupled applicati
 
 ![](documentation/architecture.png)
 
+**Procedural approach**
+
+For the processing of the HTTP connection the approach is shown in a BPMN diagram. 
+At this point the respective use of a cache validation is also illustrated.
+
+![](documentation/process_diagram.svg)
 
 
 **The approach to the low-level http connection handling is based on the [tutorial by @ssaurel](https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd)**
