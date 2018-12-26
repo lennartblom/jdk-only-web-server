@@ -188,7 +188,7 @@
       <bpmn:incoming>SequenceFlow_0dzq4ys</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_176k0g3</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:sequenceFlow id="SequenceFlow_0dzq4ys" name="Case: &#10;Remaining method" sourceRef="ExclusiveGateway_0mosozb" targetRef="Task_1oa99m7" />
+    <bpmn:sequenceFlow id="SequenceFlow_0dzq4ys" name="Case: &#10;Remaining methods" sourceRef="ExclusiveGateway_0mosozb" targetRef="Task_1oa99m7" />
     <bpmn:endEvent id="EndEvent_0n07wvf">
       <bpmn:incoming>SequenceFlow_176k0g3</bpmn:incoming>
     </bpmn:endEvent>
@@ -308,7 +308,7 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="622" y="124" />
         <di:waypoint x="739" y="124" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="643" y="115" width="30" height="27" />
+          <dc:Bounds x="631" y="137" width="30" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Task_08ibbuq_di" bpmnElement="Task_08ibbuq">
@@ -319,7 +319,7 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="622" y="773" />
         <di:waypoint x="739" y="773" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="640" y="794" width="57" height="27" />
+          <dc:Bounds x="631" y="738" width="57" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_0oiahdp_di" bpmnElement="ExclusiveGateway_0oiahdp" isMarkerVisible="true">
@@ -337,7 +337,7 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="953" y="30" />
         <di:waypoint x="1095" y="30" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="988" y="45" width="54" height="27" />
+          <dc:Bounds x="960" y="38" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Task_1ooe53r_di" bpmnElement="Task_1ooe53r">
@@ -352,32 +352,32 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_1cb3w1o_di" bpmnElement="ExclusiveGateway_1cb3w1o" isMarkerVisible="true">
-        <dc:Bounds x="928" y="748" width="50" height="50" />
+        <dc:Bounds x="859" y="748" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_12mn9vq_di" bpmnElement="SequenceFlow_12mn9vq">
         <di:waypoint x="839" y="773" />
-        <di:waypoint x="928" y="773" />
+        <di:waypoint x="859" y="773" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Task_0pqz9lc_di" bpmnElement="Task_0pqz9lc">
         <dc:Bounds x="967" y="511" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_13zqkah_di" bpmnElement="SequenceFlow_13zqkah">
-        <di:waypoint x="953" y="748" />
-        <di:waypoint x="953" y="551" />
+        <di:waypoint x="884" y="748" />
+        <di:waypoint x="884" y="551" />
         <di:waypoint x="967" y="551" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="957" y="631" width="83" height="14" />
+          <dc:Bounds x="888" y="631" width="83" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Task_1ivvzmw_di" bpmnElement="Task_1ivvzmw">
         <dc:Bounds x="969" y="947" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0t4w6i4_di" bpmnElement="SequenceFlow_0t4w6i4">
-        <di:waypoint x="953" y="798" />
-        <di:waypoint x="953" y="987" />
+        <di:waypoint x="884" y="798" />
+        <di:waypoint x="884" y="987" />
         <di:waypoint x="969" y="987" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="962" y="891" width="86" height="27" />
+          <dc:Bounds x="893" y="891" width="86" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Task_08m2v82_di" bpmnElement="Task_08m2v82">
@@ -404,7 +404,7 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="1787" y="482" />
         <di:waypoint x="1872" y="482" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1815" y="496" width="15" height="14" />
+          <dc:Bounds x="1800" y="500" width="15" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_18ov0oz_di" bpmnElement="EndEvent_18ov0oz">
@@ -452,7 +452,7 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="1787" y="905" />
         <di:waypoint x="1872" y="905" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1816" y="915" width="15" height="14" />
+          <dc:Bounds x="1802" y="913" width="15" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_08b2tcw_di" bpmnElement="SequenceFlow_08b2tcw">
@@ -560,7 +560,7 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="1147" y="740" />
         <di:waypoint x="1247" y="740" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1154" y="632" width="63" height="27" />
+          <dc:Bounds x="1152" y="601" width="63" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_1w9qiw4_di" bpmnElement="EndEvent_1w9qiw4">
@@ -597,7 +597,7 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="693" y="356" />
         <di:waypoint x="1872" y="356" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="724" y="441" width="53" height="40" />
+          <dc:Bounds x="701" y="373" width="53" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_0n07wvf_di" bpmnElement="EndEvent_0n07wvf">
@@ -608,11 +608,11 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
         <di:waypoint x="2048" y="356" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_15lin11_di" bpmnElement="TextAnnotation_15lin11">
-        <dc:Bounds x="774" y="251" width="219" height="96" />
+        <dc:Bounds x="696" y="235" width="219" height="96" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_0pvqxnw_di" bpmnElement="Association_0pvqxnw">
-        <di:waypoint x="969" y="260" />
-        <di:waypoint x="989" y="251" />
+        <di:waypoint x="969" y="248" />
+        <di:waypoint x="915" y="259" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_1n6og6m_di" bpmnElement="ExclusiveGateway_1n6og6m" isMarkerVisible="true">
         <dc:Bounds x="1225" y="212" width="50" height="50" />
@@ -675,10 +675,10 @@ Save each HTTP header to Map entry and concat HTTP body to String variable</bpmn
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0an84cr_di" bpmnElement="SequenceFlow_0an84cr">
         <di:waypoint x="1522" y="962" />
-        <di:waypoint x="1522" y="761" />
-        <di:waypoint x="1872" y="761" />
+        <di:waypoint x="1522" y="786" />
+        <di:waypoint x="1872" y="786" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1526" y="854" width="69" height="14" />
+          <dc:Bounds x="1526" y="867" width="69" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1osn2h4_di" bpmnElement="SequenceFlow_1osn2h4">
