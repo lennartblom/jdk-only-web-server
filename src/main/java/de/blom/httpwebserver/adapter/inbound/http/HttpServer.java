@@ -68,8 +68,8 @@ public class HttpServer implements Runnable {
             }
 
             StringTokenizer httpRequestLineElements = new StringTokenizer(httpRequestContentLine);
-            String rawHttpMethod = httpRequestLineElements.nextToken().toUpperCase();
 
+            String rawHttpMethod = httpRequestLineElements.nextToken().toUpperCase();
             String httpUri = httpRequestLineElements.nextToken().toLowerCase();
 
             HTTPMethod httpMethod = this.identifyHTTPMethod(rawHttpMethod);
