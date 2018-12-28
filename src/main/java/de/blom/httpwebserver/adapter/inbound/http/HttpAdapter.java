@@ -5,6 +5,7 @@ import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
+import de.blom.httpwebserver.enums.HttpMethod;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -23,6 +24,13 @@ public class HttpAdapter implements Runnable {
     private Socket connect;
     private DirectoryService directoryService;
 
+
+    private HttpAdapter(Socket c, String directoryParam) {
+        this.responseWriter = new ResponseWriter();
+        this.connect = c;
+        this.directoryService = new DirectoryService(directoryParam);
+    }
+
     private HttpAdapter(Socket c) {
         this.responseWriter = new ResponseWriter();
         this.connect = c;
@@ -34,13 +42,23 @@ public class HttpAdapter implements Runnable {
         this.responseWriter = responseWriter;
     }
 
+    HttpAdapter(Socket c, ResponseWriter responseWriter, DirectoryService directoryService) {
+        this(c, responseWriter);
+        this.directoryService = directoryService;
+    }
+
     public static void main(String[] args) {
         try {
             ServerSocket serverConnect = new ServerSocket(PORT);
             log.info("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
+            String directoryParam = null;
+            if(args.length == 1){
+                directoryParam = args[0];
+            }
+
             while (true) {
-                HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept());
+                HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept(), directoryParam);
 
                 if (VERBOSE) {
                     log.info("Connection opened. (" + new Date() + ")");
@@ -86,10 +104,8 @@ public class HttpAdapter implements Runnable {
                 break;
 
             case HEAD:
-
-                break;
             case GET:
-                this.handleGetRequest(httpRequest.getUri(), httpResponseHead, httpResponseBody);
+                this.handleDirectoryServerRequest(httpRequest, httpResponseHead, httpResponseBody);
                 break;
 
             default:
@@ -98,11 +114,13 @@ public class HttpAdapter implements Runnable {
         }
     }
 
-    void handleGetRequest(String uri, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
+    void handleDirectoryServerRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
+        String uri = httpRequest.getUri();
+
         if (uri.endsWith("/")) {
-            this.handleGetDirectory(uri, httpResponseHead, httpResponseBody);
+            this.handleDirectoryRequest(httpRequest, httpResponseHead, httpResponseBody);
         } else {
-            this.handleGetFile(uri, httpResponseHead, httpResponseBody);
+            this.handleFileRequest(httpRequest, httpResponseHead, httpResponseBody);
         }
     }
 
@@ -124,22 +142,32 @@ public class HttpAdapter implements Runnable {
         }
     }
 
-    void handleGetFile(String uri, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
-        FileRequestDto response = this.directoryService.handleFileRequest(uri);
+    void handleFileRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
+        FileRequestDto fileRequestDto = this.directoryService.handleFileRequest(httpRequest.getUri());
 
-        if (!response.getFound()) {
-            this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
+        if (!fileRequestDto.getFound()) {
+            this.responseWriter.respondeWith404(httpResponseHead, null);
         } else {
-            this.responseWriter.writeHttpResponse(response, httpResponseHead, httpResponseBody);
+            this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, null);
         }
     }
 
-    void handleGetDirectory(String uri, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
-        DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(uri);
+    void handleDirectoryRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
+        DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(httpRequest.getUri());
         if (!directoryRequestDto.getFound()) {
-            this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
+            if(httpRequest.getMethod() == HttpMethod.HEAD){
+                this.responseWriter.respondeWith404(httpResponseHead, null);
+            }else {
+                this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
+            }
+
         } else {
-            this.responseWriter.writeHttpResponse(directoryRequestDto, httpResponseHead, httpResponseBody);
+            if(httpRequest.getMethod() == HttpMethod.HEAD){
+                this.responseWriter.writeHttpResponse(directoryRequestDto, httpResponseHead, null);
+            }else {
+                this.responseWriter.writeHttpResponse(directoryRequestDto, httpResponseHead, httpResponseBody);
+            }
+
         }
     }
 

@@ -12,8 +12,8 @@ import java.util.List;
 
 public class ResponseWriter {
 
-    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li><a href=\"%s/\">%s/</a></li>";
-    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li><a href=\"%s\">%s</a></li>";
+    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li>%s/</li>";
+    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li>%s</li>";
     private static final String FILE_NOT_FOUND_HTML = "<h1>404 not Found</h1>";
     private static final String METHOD_NOT_IMPLEMENTED_HTML = "<h1>501 method not implemented</h1>";
 
@@ -44,13 +44,17 @@ public class ResponseWriter {
         }
     }
 
-    public void writeHttpResponse(PrintWriter httpResponseHead, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
+    void writeHttpResponse(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, int contentLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
         this.writeResponseHeader(statusCode, httpResponseHead);
-        this.writeResponseContentInformation(contentMimeType, fileLength, httpResponseHead);
+        this.writeResponseContentInformation(contentMimeType, contentLength, httpResponseHead);
         httpResponseHead.println();
         httpResponseHead.flush();
-        dataOut.write(fileData, 0, fileLength);
-        dataOut.flush();
+
+        if (httpResponseBody != null) {
+            httpResponseBody.write(fileData, 0, contentLength);
+            httpResponseBody.flush();
+        }
+
     }
 
     void writeResponseHeader(int httpStatus, PrintWriter httpResponseHead) {
