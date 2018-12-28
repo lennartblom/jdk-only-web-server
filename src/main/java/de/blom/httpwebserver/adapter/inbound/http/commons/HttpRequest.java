@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 @Getter
 public class HttpRequest {
     private static final Logger log = Logger.getLogger(HttpRequest.class.getName());
+    private static final String APPLICATION_JSON = "application/json";
+    private static final String CONTENT_TYPE = "Content-Type";
 
     private HttpMethod method;
     private String uri;
@@ -33,7 +35,6 @@ public class HttpRequest {
 
     }
 
-
     static HttpMethod identifyHTTPMethod(String method) {
         method = method.toUpperCase();
         try {
@@ -42,6 +43,10 @@ public class HttpRequest {
             log.log(Level.SEVERE, "Given method can not be handled yet", e);
             return HttpMethod.NOT_IMPLEMENTED_YET;
         }
+    }
+
+    public boolean isContentTypeApplicationJson(){
+        return this.headers.containsKey(CONTENT_TYPE) && APPLICATION_JSON.equals(this.headers.get(CONTENT_TYPE));
     }
 
     public static HttpRequest parseFrom(BufferedReader in) throws IOException {

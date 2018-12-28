@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.domain.fileserver;
+package de.blom.httpwebserver.representation.fileserver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ public class FileRequestDto {
     byte[] fileContent;
     int fileLength;
 
-    FileRequestDto(Boolean found){
+    public FileRequestDto(Boolean found){
         this.found = found;
     }
 }

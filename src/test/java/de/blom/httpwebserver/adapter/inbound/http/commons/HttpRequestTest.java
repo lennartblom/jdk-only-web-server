@@ -14,6 +14,8 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class HttpRequestTest {
 
@@ -77,6 +79,24 @@ public class HttpRequestTest {
         assertThat(httpRequest.getMethod(), is(HttpMethod.GET));
         assertThat(httpRequest.getUri(), is("/pub/WWW/TheProject.html"));
         assertThat(httpRequest.getHeaders(), SamePropertyValuesAs.samePropertyValuesAs(expectedHeaders));
+    }
+
+    @Test
+    public void expectToReturnFalsWithNotExistingContentTypeApplicationJson(){
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Host", "google.com");
+        HttpRequest httpRequest = new HttpRequest("POST", "/", headers, "");
+
+        assertFalse(httpRequest.isContentTypeApplicationJson());
+    }
+
+    @Test
+    public void expectToReturnTrueWithExistingContentTypeApplicationJson(){
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        HttpRequest httpRequest = new HttpRequest("POST", "/", headers, "");
+
+        assertTrue(httpRequest.isContentTypeApplicationJson());
     }
 
     @Test

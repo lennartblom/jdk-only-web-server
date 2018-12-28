@@ -1,7 +1,7 @@
 package de.blom.httpwebserver.adapter.inbound.http.commons;
 
-import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
-import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
+import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import org.apache.commons.httpclient.HttpStatus;
 
 import java.io.BufferedOutputStream;
