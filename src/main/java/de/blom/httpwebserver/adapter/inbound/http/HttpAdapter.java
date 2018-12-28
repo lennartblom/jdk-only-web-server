@@ -100,7 +100,7 @@ public class HttpAdapter implements Runnable {
     void handleHttpMethod(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, HttpRequest httpRequest) throws IOException {
         switch (httpRequest.getMethod()) {
             case POST:
-                this.handlePostRequest(httpRequest.getUri());
+                this.handlePostRequest(httpRequest);
                 break;
 
             case HEAD:
@@ -124,12 +124,14 @@ public class HttpAdapter implements Runnable {
         }
     }
 
-    void handlePostRequest(String uri) {
-        log.info("HTTP Request uri='" + uri + "'");
-        switch (uri) {
+    void handlePostRequest(HttpRequest httpRequest) {
+        log.info("HTTP Request uri='" + httpRequest + "'");
+
+        switch (httpRequest.getUri()) {
             case "/comments":
             case "/comments/":
                 log.info("Comment creation");
+                System.out.println(httpRequest.getRawBody());
                 break;
 
             case "/comments/query":

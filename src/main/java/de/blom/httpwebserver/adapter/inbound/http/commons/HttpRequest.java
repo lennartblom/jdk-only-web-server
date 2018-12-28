@@ -70,6 +70,9 @@ public class HttpRequest {
             httpBody = httpBody.concat(nextLine);
             nextLine = in.readLine();
         }
+        if(nextLine != null){
+            httpBody = httpBody.concat(nextLine);
+        }
         return httpBody;
     }
 

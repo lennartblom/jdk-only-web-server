@@ -98,7 +98,7 @@ public class HttpAdapterTest {
         HttpRequest incomingRequest = new HttpRequest("POST", COMMENTS_URI, null, null);
         this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
-        verify(this.httpAdapter).handlePostRequest(COMMENTS_URI);
+        verify(this.httpAdapter).handlePostRequest(incomingRequest);
     }
 
     @Test
