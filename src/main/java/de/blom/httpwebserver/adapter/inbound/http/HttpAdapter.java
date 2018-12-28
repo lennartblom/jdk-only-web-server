@@ -23,6 +23,13 @@ public class HttpAdapter implements Runnable {
     private Socket connect;
     private DirectoryService directoryService;
 
+
+    private HttpAdapter(Socket c, String directoryParam) {
+        this.responseWriter = new ResponseWriter();
+        this.connect = c;
+        this.directoryService = new DirectoryService(directoryParam);
+    }
+
     private HttpAdapter(Socket c) {
         this.responseWriter = new ResponseWriter();
         this.connect = c;
@@ -39,8 +46,13 @@ public class HttpAdapter implements Runnable {
             ServerSocket serverConnect = new ServerSocket(PORT);
             log.info("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
+            String directoryParam = null;
+            if(args.length == 1){
+                directoryParam = args[0];
+            }
+
             while (true) {
-                HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept());
+                HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept(), directoryParam);
 
                 if (VERBOSE) {
                     log.info("Connection opened. (" + new Date() + ")");

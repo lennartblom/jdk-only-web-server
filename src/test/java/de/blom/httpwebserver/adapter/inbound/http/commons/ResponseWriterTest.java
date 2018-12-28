@@ -107,7 +107,7 @@ public class ResponseWriterTest {
                 .subdirectories(Collections.singletonList("subdirectory"))
                 .build();
 
-        String expectedHTML = "<ul><li><a href=\"subdirectory/\">subdirectory/</a></li><li><a href=\"index.html\">index.html</a></li></ul>";
+        String expectedHTML = "<ul><li>subdirectory/</li><li>index.html</li></ul>";
 
         this.responseWriter.writeHttpResponse(directoryRequestDto, this.out, this.dataOut);
 

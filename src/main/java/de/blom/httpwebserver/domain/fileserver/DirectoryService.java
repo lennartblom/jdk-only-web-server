@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class DirectoryService {
     private static final String CONTENT_TYPE_TEXT_HTML = "text/html";
     private static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
@@ -18,13 +17,24 @@ public class DirectoryService {
 
     private FileSystem filesystem;
 
-    public DirectoryService() {
-        this.filesystem = new FileSystem(WEB_ROOT_DIR);
+    public DirectoryService(String directoryParam) {
+        if (directoryParam != null) {
+            log.info("Initializing DirectoryService with root directory='" + directoryParam + "'");
+            this.filesystem = new FileSystem(directoryParam);
+        } else {
+            log.info("Initializing DirectoryService with root directory='" + WEB_ROOT_DIR + "'");
+            this.filesystem = new FileSystem(WEB_ROOT_DIR);
+        }
+
     }
 
-    public DirectoryRequestDto handleDirectoryRequest(String directoryPath){
+    public DirectoryService() {
+        this(null);
+    }
+
+    public DirectoryRequestDto handleDirectoryRequest(String directoryPath) {
         File directory = this.filesystem.retrieveFile(directoryPath);
-        if(directory == null){
+        if (directory == null) {
             return new DirectoryRequestDto();
         }
         File[] directoryElements = directory.listFiles();
@@ -39,9 +49,9 @@ public class DirectoryService {
 
 
             for (File file : containedFiles) {
-                if(file.listFiles() != null){
+                if (file.listFiles() != null) {
                     subdirectories.add(file.getName());
-                }else {
+                } else {
                     files.add(file.getName());
                 }
             }

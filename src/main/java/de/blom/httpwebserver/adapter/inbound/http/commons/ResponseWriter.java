@@ -12,8 +12,8 @@ import java.util.List;
 
 public class ResponseWriter {
 
-    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li><a href=\"%s/\">%s/</a></li>";
-    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li><a href=\"%s\">%s</a></li>";
+    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li>%s/</li>";
+    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li>%s</li>";
     private static final String FILE_NOT_FOUND_HTML = "<h1>404 not Found</h1>";
     private static final String METHOD_NOT_IMPLEMENTED_HTML = "<h1>501 method not implemented</h1>";
 
