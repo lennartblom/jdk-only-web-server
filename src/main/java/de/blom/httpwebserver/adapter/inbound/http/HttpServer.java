@@ -5,11 +5,13 @@ import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
+import de.blom.httpwebserver.enums.HttpMethod;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,6 +64,10 @@ public class HttpServer implements Runnable {
         ) {
             HttpRequest httpRequest = HttpRequest.parseFrom(in);
 
+            if(httpRequest == null){
+                return;
+            }
+
             this.handleHttpMethod(httpResponseHead, httpResponseBody, httpRequest);
 
         } catch (IOException ioe) {
@@ -103,7 +109,7 @@ public class HttpServer implements Runnable {
     }
 
     void handlePostRequest(String uri) {
-        log.info("POST uri='" + uri + "'");
+        log.info("HTTP Request uri='" + uri + "'");
         switch (uri) {
             case "/comments":
             case "/comments/":

@@ -48,6 +48,9 @@ public class HttpRequest {
         Map<String, String> headers = new HashMap<>();
 
         String firstLine = in.readLine();
+        if(firstLine == null){
+            return null;
+        }
         StringTokenizer firstHttpLine = new StringTokenizer(firstLine);
 
         String method = firstHttpLine.nextToken().toUpperCase();
@@ -63,7 +66,7 @@ public class HttpRequest {
 
     private static String parseHttpBody(BufferedReader in, String nextLine) throws IOException {
         String httpBody = "";
-        while (nextLine != null) {
+        while (nextLine != null && in.ready()) {
             httpBody = httpBody.concat(nextLine);
             nextLine = in.readLine();
         }
@@ -87,6 +90,11 @@ public class HttpRequest {
             return null;
         }
         StringTokenizer httpHeaderLineTokens = new StringTokenizer(line);
+
+        if(!httpHeaderLineTokens.hasMoreTokens()){
+            return null;
+        }
+
         String headerName = httpHeaderLineTokens.nextToken();
 
         if(headerName.endsWith(":")){

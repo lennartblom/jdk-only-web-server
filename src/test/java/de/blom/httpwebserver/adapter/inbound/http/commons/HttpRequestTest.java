@@ -28,8 +28,8 @@ public class HttpRequestTest {
             "Content-Type: text/plain\n" +
             "cache-control: no-cache\n" +
             "Postman-Token: 96621bec-a11a-4c9c-a7ff-6a87c9369e02\n" +
-            "Lorem ipsum dolor" +
-            "";
+            "Lorem ipsum dolor\n" +
+            "\n";
 
     private static final String TEST_HTTP_REQUEST_JSON_BODY = "POST /testRoute HTTP/1.1\n" +
             "Host: localhost\n" +
@@ -40,12 +40,27 @@ public class HttpRequestTest {
             "  \"name\": \"1531923956.517\",\n" +
             "  \"login\": \"asd\",\n" +
             "  \"password\": \"testpassword\"\n" +
-            "}" +
-            "";
+            "}\n" +
+            "\n";
+
+    private static final String TEST_CHROM_REQUEST = "GET / HTTP/1.1\n" +
+            "Host: localhost:8080\n" +
+            "Connection: keep-alive\n" +
+            "Dec 28, 2018 6:11:18 PM de.blom.httpwebserver.adapter.inbound.http.HttpServer main\n" +
+            "INFO: Connection opened. (Fri Dec 28 18:11:18 CET 2018)\n" +
+            "Cache-Control: max-age=0\n" +
+            "Upgrade-Insecure-Requests: 1\n" +
+            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36\n" +
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\n" +
+            "Accept-Encoding: gzip, deflate, br\n" +
+            "Accept-Language: de,en-US;q=0.9,en;q=0.8\n" +
+            "Cookie: PHPSESSID=3d8ujruupf7hf7su1gs2c7jcj6; JSESSIONID=1067490977143665192; grafana_sess=32da410c3a4292d1; redirect_to=%252F; io=kucVFKNOXuMq3nDRAAAa\n" +
+            " \n";
+
 
     private BufferedReader bufferedReader;
 
-    private void prepareBufferedReader(String rawData){
+    private void prepareBufferedReader(String rawData) {
         this.bufferedReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(rawData.getBytes())));
     }
 
@@ -98,6 +113,20 @@ public class HttpRequestTest {
         assertThat(httpRequest.getRawBody(), is("{  \"name\": \"1531923956.517\",  \"login\": \"asd\",  \"password\": \"testpassword\"}"));
     }
 
+    @Test
+    public void expectToSetHeadersFromChromGetRequest() throws IOException {
+
+        this.prepareBufferedReader(TEST_CHROM_REQUEST);
+        Map<String, String> expectedHeaders = new HashMap<>();
+        expectedHeaders.put("Content-Type", "application/json");
+        expectedHeaders.put("Host", "localhost");
+        expectedHeaders.put("cache-control", "no-cache");
+        expectedHeaders.put("Postman-Token", "96621bec-a11a-4c9c-a7ff-6a87c9369e02");
+        HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
+
+        assertThat(httpRequest.getMethod(), is(HttpMethod.GET));
+    }
+
 
     @Test
     public void expectToIdentifyGetMethod() {
@@ -119,5 +148,6 @@ public class HttpRequestTest {
 
         Assert.assertThat(enumEntry, is(HttpMethod.NOT_IMPLEMENTED_YET));
     }
+
 
 }
