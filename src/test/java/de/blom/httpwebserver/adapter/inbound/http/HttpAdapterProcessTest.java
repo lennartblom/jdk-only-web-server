@@ -1,7 +1,6 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
-import de.blom.httpwebserver.enums.HttpMethod;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,10 +19,10 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class HttpServerProcessTest {
+public class HttpAdapterProcessTest {
 
 
-    private HttpServer httpServer;
+    private HttpAdapter httpAdapter;
 
     @Mock
     private BufferedReader in;
@@ -50,18 +49,18 @@ public class HttpServerProcessTest {
     public void setup() throws IOException {
         when(this.mockedSocket.getInputStream()).thenReturn(this.mockedInputStream);
         when(this.mockedSocket.getOutputStream()).thenReturn(this.mockedOutputStream);
-        this.httpServer = new HttpServer(this.mockedSocket, this.responseWriter);
-        this.httpServer = Mockito.spy(this.httpServer);
+        this.httpAdapter = new HttpAdapter(this.mockedSocket, this.responseWriter);
+        this.httpAdapter = Mockito.spy(this.httpAdapter);
     }
 
     @Test
     @Ignore
     public void expectToHandleHttpMethod() {
-        /*Mockito.doReturn(HttpMethod.POST).when(this.httpServer).identifyHTTPMethod(any(String.class));
+        /*Mockito.doReturn(HttpMethod.POST).when(this.httpAdapter).identifyHTTPMethod(any(String.class));
 
-        this.httpServer.run();
+        this.httpAdapter.run();
 
-        verify(this.httpServer).handleHttpMethod(any(PrintWriter.class), any(BufferedOutputStream.class), any(String.class), eq(HttpMethod.POST));*/
+        verify(this.httpAdapter).handleHttpMethod(any(PrintWriter.class), any(BufferedOutputStream.class), any(String.class), eq(HttpMethod.POST));*/
     }
 
 }

@@ -13,8 +13,8 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HttpServer implements Runnable {
-    private static final Logger log = Logger.getLogger(HttpServer.class.getName());
+public class HttpAdapter implements Runnable {
+    private static final Logger log = Logger.getLogger(HttpAdapter.class.getName());
 
     private static final int PORT = 8080;
     private static final boolean VERBOSE = true;
@@ -23,13 +23,13 @@ public class HttpServer implements Runnable {
     private Socket connect;
     private DirectoryService directoryService;
 
-    private HttpServer(Socket c) {
+    private HttpAdapter(Socket c) {
         this.responseWriter = new ResponseWriter();
         this.connect = c;
         this.directoryService = new DirectoryService();
     }
 
-    HttpServer(Socket c, ResponseWriter responseWriter) {
+    HttpAdapter(Socket c, ResponseWriter responseWriter) {
         this(c);
         this.responseWriter = responseWriter;
     }
@@ -40,14 +40,14 @@ public class HttpServer implements Runnable {
             log.info("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
             while (true) {
-                HttpServer httpServer = new HttpServer(serverConnect.accept());
+                HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept());
 
                 if (VERBOSE) {
                     log.info("Connection opened. (" + new Date() + ")");
                 }
 
                 // create dedicated thread to manage the client connection
-                Thread thread = new Thread(httpServer);
+                Thread thread = new Thread(httpAdapter);
                 thread.start();
             }
         } catch (IOException e) {

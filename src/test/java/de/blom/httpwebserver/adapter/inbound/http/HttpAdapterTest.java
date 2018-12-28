@@ -2,7 +2,6 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
-import de.blom.httpwebserver.enums.HttpMethod;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,14 +22,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HttpServerTest {
+public class HttpAdapterTest {
 
 
     private static final String INDEX_HTML = "/index.html";
     private static final String COMMENTS_URI = "/comments";
     private static final String ROOT_DIRECTORY = "/";
 
-    private HttpServer httpServer;
+    private HttpAdapter httpAdapter;
 
     @Mock
     private BufferedReader in;
@@ -49,47 +48,47 @@ public class HttpServerTest {
 
     @Before
     public void setup() {
-        this.httpServer = new HttpServer(this.mockedSocket, this.responseWriter);
-        this.httpServer = Mockito.spy(this.httpServer);
+        this.httpAdapter = new HttpAdapter(this.mockedSocket, this.responseWriter);
+        this.httpAdapter = Mockito.spy(this.httpAdapter);
     }
 
 
     @Test
     public void expectToCallHandleGetMethod() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("GET", INDEX_HTML, null, null);
-        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
-        verify(this.httpServer).handleGetRequest(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
+        verify(this.httpAdapter).handleGetRequest(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test
     public void expectToCallHandlePostMethod() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("POST", COMMENTS_URI, null, null);
-        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
-        verify(this.httpServer).handlePostRequest(COMMENTS_URI);
+        verify(this.httpAdapter).handlePostRequest(COMMENTS_URI);
     }
 
     @Test
     public void expectHandleNotSupportedMethodWith501() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("PUT", COMMENTS_URI, null, null);
-        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.responseWriter).respondeWith501(this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test
     public void expectToCallDirectoryHandling() throws IOException {
-        this.httpServer.handleGetRequest(ROOT_DIRECTORY, this.httpResponseHeader, this.httpResponseBody);
+        this.httpAdapter.handleGetRequest(ROOT_DIRECTORY, this.httpResponseHeader, this.httpResponseBody);
 
-        verify(this.httpServer).handleGetDirectory(ROOT_DIRECTORY, this.httpResponseHeader, this.httpResponseBody);
+        verify(this.httpAdapter).handleGetDirectory(ROOT_DIRECTORY, this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test
     public void expectToCallFileHandling() throws IOException {
-        this.httpServer.handleGetRequest(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
+        this.httpAdapter.handleGetRequest(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
 
-        verify(this.httpServer).handleGetFile(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
+        verify(this.httpAdapter).handleGetFile(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
     }
 
 

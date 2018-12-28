@@ -46,7 +46,7 @@ public class HttpRequestTest {
     private static final String TEST_CHROM_REQUEST = "GET / HTTP/1.1\n" +
             "Host: localhost:8080\n" +
             "Connection: keep-alive\n" +
-            "Dec 28, 2018 6:11:18 PM de.blom.httpwebserver.adapter.inbound.http.HttpServer main\n" +
+            "Dec 28, 2018 6:11:18 PM de.blom.httpwebserver.adapter.inbound.http.HttpAdapter main\n" +
             "INFO: Connection opened. (Fri Dec 28 18:11:18 CET 2018)\n" +
             "Cache-Control: max-age=0\n" +
             "Upgrade-Insecure-Requests: 1\n" +
