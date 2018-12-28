@@ -1,6 +1,8 @@
-package de.blom.httpwebserver.adapter.inbound.http.util;
+package de.blom.httpwebserver.adapter.inbound.http.commons;
 
+import de.blom.httpwebserver.enums.HttpMethod;
 import org.hamcrest.beans.SamePropertyValuesAs;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -57,7 +59,7 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
-        assertThat(httpRequest.getMethod(), is("GET"));
+        assertThat(httpRequest.getMethod(), is(HttpMethod.GET));
         assertThat(httpRequest.getUri(), is("/pub/WWW/TheProject.html"));
         assertThat(httpRequest.getHeaders(), SamePropertyValuesAs.samePropertyValuesAs(expectedHeaders));
     }
@@ -73,7 +75,7 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
-        assertThat(httpRequest.getMethod(), is("POST"));
+        assertThat(httpRequest.getMethod(), is(HttpMethod.POST));
         assertThat(httpRequest.getUri(), is("/testRoute"));
         assertThat(httpRequest.getHeaders(), SamePropertyValuesAs.samePropertyValuesAs(expectedHeaders));
         assertThat(httpRequest.getRawBody(), is("Lorem ipsum dolor"));
@@ -90,11 +92,32 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
-        assertThat(httpRequest.getMethod(), is("POST"));
+        assertThat(httpRequest.getMethod(), is(HttpMethod.POST));
         assertThat(httpRequest.getUri(), is("/testRoute"));
         assertThat(httpRequest.getHeaders(), SamePropertyValuesAs.samePropertyValuesAs(expectedHeaders));
         assertThat(httpRequest.getRawBody(), is("{  \"name\": \"1531923956.517\",  \"login\": \"asd\",  \"password\": \"testpassword\"}"));
     }
 
+
+    @Test
+    public void expectToIdentifyGetMethod() {
+        HttpMethod enumEntry = HttpRequest.identifyHTTPMethod("Get");
+
+        Assert.assertThat(enumEntry, is(HttpMethod.GET));
+    }
+
+    @Test
+    public void expectToIdentifyHeadMethod() {
+        HttpMethod enumEntry = HttpRequest.identifyHTTPMethod("Head");
+
+        Assert.assertThat(enumEntry, is(HttpMethod.HEAD));
+    }
+
+    @Test
+    public void expectToReturnNull() {
+        HttpMethod enumEntry = HttpRequest.identifyHTTPMethod("Put");
+
+        Assert.assertThat(enumEntry, is(HttpMethod.NOT_IMPLEMENTED_YET));
+    }
 
 }

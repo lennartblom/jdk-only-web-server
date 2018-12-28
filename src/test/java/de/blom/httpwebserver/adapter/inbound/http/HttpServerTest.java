@@ -1,7 +1,8 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
-import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
-import de.blom.httpwebserver.enums.HTTPMethod;
+import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
+import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
+import de.blom.httpwebserver.enums.HttpMethod;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpServerTest {
@@ -53,44 +53,27 @@ public class HttpServerTest {
         this.httpServer = Mockito.spy(this.httpServer);
     }
 
-    @Test
-    public void expectToIdentifyGetMethod() {
-        HTTPMethod enumEntry = this.httpServer.identifyHTTPMethod("Get");
-
-        assertThat(enumEntry, is(HTTPMethod.GET));
-    }
-
-    @Test
-    public void expectToIdentifyHeadMethod() {
-        HTTPMethod enumEntry = this.httpServer.identifyHTTPMethod("Head");
-
-        assertThat(enumEntry, is(HTTPMethod.HEAD));
-    }
-
-    @Test
-    public void expectToReturnNull() {
-        HTTPMethod enumEntry = this.httpServer.identifyHTTPMethod("Put");
-
-        assertThat(enumEntry, is(HTTPMethod.NOT_IMPLEMENTED_YET));
-    }
 
     @Test
     public void expectToCallHandleGetMethod() throws IOException {
-        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, INDEX_HTML, HTTPMethod.GET);
+        HttpRequest incomingRequest = new HttpRequest("GET", INDEX_HTML, null, null);
+        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.httpServer).handleGetRequest(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test
     public void expectToCallHandlePostMethod() throws IOException {
-        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, COMMENTS_URI, HTTPMethod.POST);
+        HttpRequest incomingRequest = new HttpRequest("POST", COMMENTS_URI, null, null);
+        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.httpServer).handlePostRequest(COMMENTS_URI);
     }
 
     @Test
     public void expectHandleNotSupportedMethodWith501() throws IOException {
-        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, COMMENTS_URI, HTTPMethod.NOT_IMPLEMENTED_YET);
+        HttpRequest incomingRequest = new HttpRequest("PUT", COMMENTS_URI, null, null);
+        this.httpServer.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.responseWriter).respondeWith501(this.httpResponseHeader, this.httpResponseBody);
     }

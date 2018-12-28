@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.adapter.inbound.http.util;
+package de.blom.httpwebserver.adapter.inbound.http.commons;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;

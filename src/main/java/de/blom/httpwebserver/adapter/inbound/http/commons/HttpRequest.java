@@ -1,5 +1,6 @@
-package de.blom.httpwebserver.adapter.inbound.http.util;
+package de.blom.httpwebserver.adapter.inbound.http.commons;
 
+import de.blom.httpwebserver.enums.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,17 +9,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Getter
 public class HttpRequest {
+    private static final Logger log = Logger.getLogger(HttpRequest.class.getName());
 
-    private String method;
+    private HttpMethod method;
     private String uri;
     private Map<String, String> headers;
     private String rawBody;
 
-    private HttpRequest(String method, String uri, Map<String, String> headers, String rawBody) {
-        this.method = method;
+    public HttpRequest(String method, String uri, Map<String, String> headers, String rawBody) {
+        this.method = identifyHTTPMethod(method);
         this.uri = uri;
         if(headers != null){
             this.headers = headers;
@@ -29,7 +33,18 @@ public class HttpRequest {
 
     }
 
-    static HttpRequest parseFrom(BufferedReader in) throws IOException {
+
+    static HttpMethod identifyHTTPMethod(String method) {
+        method = method.toUpperCase();
+        try {
+            return HttpMethod.valueOf(method);
+        } catch (IllegalArgumentException e) {
+            log.log(Level.SEVERE, "Given method can not be handled yet", e);
+            return HttpMethod.NOT_IMPLEMENTED_YET;
+        }
+    }
+
+    public static HttpRequest parseFrom(BufferedReader in) throws IOException {
         Map<String, String> headers = new HashMap<>();
 
         String firstLine = in.readLine();

@@ -1,6 +1,6 @@
 package de.blom.httpwebserver.enums;
 
-public enum HTTPMethod {
+public enum HttpMethod {
     GET,
     HEAD,
     POST,

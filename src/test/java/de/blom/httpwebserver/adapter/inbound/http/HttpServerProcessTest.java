@@ -1,7 +1,7 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
-import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
-import de.blom.httpwebserver.enums.HTTPMethod;
+import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
+import de.blom.httpwebserver.enums.HttpMethod;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,12 +56,12 @@ public class HttpServerProcessTest {
 
     @Test
     @Ignore
-    public void expectToHandleHttpMethod() throws IOException {
-        Mockito.doReturn(HTTPMethod.POST).when(this.httpServer).identifyHTTPMethod(any(String.class));
+    public void expectToHandleHttpMethod() {
+        /*Mockito.doReturn(HttpMethod.POST).when(this.httpServer).identifyHTTPMethod(any(String.class));
 
         this.httpServer.run();
 
-        verify(this.httpServer).handleHttpMethod(any(PrintWriter.class), any(BufferedOutputStream.class), any(String.class), eq(HTTPMethod.POST));
+        verify(this.httpServer).handleHttpMethod(any(PrintWriter.class), any(BufferedOutputStream.class), any(String.class), eq(HttpMethod.POST));*/
     }
 
 }
