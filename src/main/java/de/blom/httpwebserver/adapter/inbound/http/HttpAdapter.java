@@ -2,9 +2,9 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
-import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
-import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
+import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.enums.HttpMethod;
 
 import java.io.*;
@@ -131,7 +131,8 @@ public class HttpAdapter implements Runnable {
             case "/comments":
             case "/comments/":
                 log.info("Comment creation");
-                System.out.println(httpRequest.getRawBody());
+
+
                 break;
 
             case "/comments/query":
