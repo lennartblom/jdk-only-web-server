@@ -1,22 +1,20 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
-import de.blom.httpwebserver.adapter.inbound.http.util.ResponseWriter;
+import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
+import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
-import de.blom.httpwebserver.enums.HTTPMethod;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HttpServer implements Runnable {
-
-    private static final Logger log = Logger.getLogger(HttpServer.class.getName());
+public class HttpAdapter implements Runnable {
+    private static final Logger log = Logger.getLogger(HttpAdapter.class.getName());
 
     private static final int PORT = 8080;
     private static final boolean VERBOSE = true;
@@ -25,13 +23,13 @@ public class HttpServer implements Runnable {
     private Socket connect;
     private DirectoryService directoryService;
 
-    private HttpServer(Socket c) {
+    private HttpAdapter(Socket c) {
         this.responseWriter = new ResponseWriter();
         this.connect = c;
         this.directoryService = new DirectoryService();
     }
 
-    HttpServer(Socket c, ResponseWriter responseWriter) {
+    HttpAdapter(Socket c, ResponseWriter responseWriter) {
         this(c);
         this.responseWriter = responseWriter;
     }
@@ -42,14 +40,14 @@ public class HttpServer implements Runnable {
             log.info("Server started.\nListening for connections on port : " + PORT + " ...\n");
 
             while (true) {
-                HttpServer httpServer = new HttpServer(serverConnect.accept());
+                HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept());
 
                 if (VERBOSE) {
                     log.info("Connection opened. (" + new Date() + ")");
                 }
 
                 // create dedicated thread to manage the client connection
-                Thread thread = new Thread(httpServer);
+                Thread thread = new Thread(httpAdapter);
                 thread.start();
             }
         } catch (IOException e) {
@@ -62,19 +60,13 @@ public class HttpServer implements Runnable {
              PrintWriter httpResponseHead = new PrintWriter(this.connect.getOutputStream());
              BufferedOutputStream httpResponseBody = new BufferedOutputStream(this.connect.getOutputStream())
         ) {
-            String httpRequestContentLine = in.readLine();
-            if (httpRequestContentLine == null) {
+            HttpRequest httpRequest = HttpRequest.parseFrom(in);
+
+            if(httpRequest == null){
                 return;
             }
 
-            StringTokenizer httpRequestLineElements = new StringTokenizer(httpRequestContentLine);
-
-            String rawHttpMethod = httpRequestLineElements.nextToken().toUpperCase();
-            String httpUri = httpRequestLineElements.nextToken().toLowerCase();
-
-            HTTPMethod httpMethod = this.identifyHTTPMethod(rawHttpMethod);
-
-            this.handleHttpMethod(httpResponseHead, httpResponseBody, httpUri, httpMethod);
+            this.handleHttpMethod(httpResponseHead, httpResponseBody, httpRequest);
 
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);
@@ -87,17 +79,17 @@ public class HttpServer implements Runnable {
 
     }
 
-    void handleHttpMethod(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, String uri, HTTPMethod httpMethod) throws IOException {
-        switch (httpMethod) {
+    void handleHttpMethod(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, HttpRequest httpRequest) throws IOException {
+        switch (httpRequest.getMethod()) {
             case POST:
-                this.handlePostRequest(uri);
+                this.handlePostRequest(httpRequest.getUri());
                 break;
 
             case HEAD:
 
                 break;
             case GET:
-                this.handleGetRequest(uri, httpResponseHead, httpResponseBody);
+                this.handleGetRequest(httpRequest.getUri(), httpResponseHead, httpResponseBody);
                 break;
 
             default:
@@ -115,7 +107,7 @@ public class HttpServer implements Runnable {
     }
 
     void handlePostRequest(String uri) {
-        log.info("POST uri='" + uri + "'");
+        log.info("HTTP Request uri='" + uri + "'");
         switch (uri) {
             case "/comments":
             case "/comments/":
@@ -151,14 +143,5 @@ public class HttpServer implements Runnable {
         }
     }
 
-    HTTPMethod identifyHTTPMethod(String method) {
-        method = method.toUpperCase();
-        try {
-            return HTTPMethod.valueOf(method);
-        } catch (IllegalArgumentException e) {
-            log.log(Level.SEVERE, "Given method can not be handled yet", e);
-            return HTTPMethod.NOT_IMPLEMENTED_YET;
-        }
-    }
 
 }

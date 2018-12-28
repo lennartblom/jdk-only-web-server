@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.adapter.inbound.http.util;
+package de.blom.httpwebserver.adapter.inbound.http.commons;
 
 import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
 import org.apache.commons.httpclient.HttpStatus;
