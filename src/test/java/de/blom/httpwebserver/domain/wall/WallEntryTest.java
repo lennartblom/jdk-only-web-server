@@ -1,6 +1,7 @@
 package de.blom.httpwebserver.domain.wall;
 
 import com.mongodb.DBObject;
+import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -20,6 +21,16 @@ public class WallEntryTest {
     @Test
     public void expectToCreateWallEntryWithCurrentDate(){
         WallEntry wallEntry = new WallEntry(AUTHOR, TEXT);
+
+        assertThat(wallEntry.getCreated(), any(Date.class));
+        assertThat(wallEntry.getAuthor(), is(AUTHOR));
+        assertThat(wallEntry.getText(), is(TEXT));
+    }
+
+    @Test
+    public void expectToCreateEntryWithCorrectDtoData(){
+        WallEntryInboundDto dto = new WallEntryInboundDto(AUTHOR, TEXT);
+        WallEntry wallEntry = new WallEntry(dto);
 
         assertThat(wallEntry.getCreated(), any(Date.class));
         assertThat(wallEntry.getAuthor(), is(AUTHOR));
