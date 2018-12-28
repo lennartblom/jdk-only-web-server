@@ -44,13 +44,17 @@ public class ResponseWriter {
         }
     }
 
-    public void writeHttpResponse(PrintWriter httpResponseHead, BufferedOutputStream dataOut, int fileLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
+    void writeHttpResponse(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, int contentLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
         this.writeResponseHeader(statusCode, httpResponseHead);
-        this.writeResponseContentInformation(contentMimeType, fileLength, httpResponseHead);
+        this.writeResponseContentInformation(contentMimeType, contentLength, httpResponseHead);
         httpResponseHead.println();
         httpResponseHead.flush();
-        dataOut.write(fileData, 0, fileLength);
-        dataOut.flush();
+
+        if (httpResponseBody != null) {
+            httpResponseBody.write(fileData, 0, contentLength);
+            httpResponseBody.flush();
+        }
+
     }
 
     void writeResponseHeader(int httpStatus, PrintWriter httpResponseHead) {

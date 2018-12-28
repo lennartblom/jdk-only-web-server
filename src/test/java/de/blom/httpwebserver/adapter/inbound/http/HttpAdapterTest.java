@@ -2,6 +2,9 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
+import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.domain.fileserver.DirectoryService;
+import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpAdapterTest {
@@ -46,19 +49,48 @@ public class HttpAdapterTest {
     @Mock
     private Socket mockedSocket;
 
+    @Mock
+    private DirectoryService directoryService;
+
+    @Mock
+    private DirectoryRequestDto mockedDirectoryRequestDtoNotFound;
+
+    @Mock
+    private DirectoryRequestDto mockedDirectoryRequestDtoFound;
+
+    @Mock
+    private FileRequestDto mockedFileRequestDtoNotFound;
+
+    @Mock
+    private FileRequestDto mockedFileRequestDtoFound;
+
     @Before
     public void setup() {
-        this.httpAdapter = new HttpAdapter(this.mockedSocket, this.responseWriter);
+        this.httpAdapter = new HttpAdapter(this.mockedSocket, this.responseWriter, this.directoryService);
         this.httpAdapter = Mockito.spy(this.httpAdapter);
+
+        this.mockedDirectoryRequestDtoNotFound = mock(DirectoryRequestDto.class);
+        when(mockedDirectoryRequestDtoNotFound.getFound()).thenReturn(false);
+
+        this.mockedDirectoryRequestDtoFound = mock(DirectoryRequestDto.class);
+        when(mockedDirectoryRequestDtoFound.getFound()).thenReturn(true);
+
+        this.mockedFileRequestDtoFound = mock(FileRequestDto.class);
+        when(mockedFileRequestDtoFound.getFound()).thenReturn(false);
+
+        this.mockedFileRequestDtoFound = mock(FileRequestDto.class);
+        when(mockedFileRequestDtoFound.getFound()).thenReturn(true);
     }
 
 
     @Test
     public void expectToCallHandleGetMethod() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("GET", INDEX_HTML, null, null);
+        doNothing().when(this.httpAdapter).handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
         this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
-        verify(this.httpAdapter).handleGetRequest(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
+        verify(this.httpAdapter).handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test
@@ -79,17 +111,68 @@ public class HttpAdapterTest {
 
     @Test
     public void expectToCallDirectoryHandling() throws IOException {
-        this.httpAdapter.handleGetRequest(ROOT_DIRECTORY, this.httpResponseHeader, this.httpResponseBody);
+        HttpRequest incomingRequest = new HttpRequest("GET", ROOT_DIRECTORY, null, null);
+        when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY)).thenReturn(this.mockedDirectoryRequestDtoFound);
 
-        verify(this.httpAdapter).handleGetDirectory(ROOT_DIRECTORY, this.httpResponseHeader, this.httpResponseBody);
+        this.httpAdapter.handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        verify(this.httpAdapter).handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test
     public void expectToCallFileHandling() throws IOException {
-        this.httpAdapter.handleGetRequest(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
+        HttpRequest incomingRequest = new HttpRequest("GET", INDEX_HTML, null, null);
+        when(this.directoryService.handleFileRequest(INDEX_HTML)).thenReturn(mockedFileRequestDtoFound);
 
-        verify(this.httpAdapter).handleGetFile(INDEX_HTML, this.httpResponseHeader, this.httpResponseBody);
+        this.httpAdapter.handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        verify(this.httpAdapter).handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
     }
+
+    @Test
+    public void expectToCallFileHandlingNotFoundWithoutHttpResponseBody() throws IOException {
+        HttpRequest incomingRequest = new HttpRequest("HEAD", INDEX_HTML, null, null);
+        when(this.directoryService.handleFileRequest(INDEX_HTML)).thenReturn(this.mockedFileRequestDtoNotFound);
+
+        this.httpAdapter.handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        verify(this.responseWriter).respondeWith404(this.httpResponseHeader, null);
+    }
+
+
+    @Test
+    public void expectToCallFileHandlingWithoutHttpResponseBody() throws IOException {
+        when(this.directoryService.handleFileRequest(INDEX_HTML)).thenReturn(this.mockedFileRequestDtoFound);
+        HttpRequest incomingRequest = new HttpRequest("HEAD", INDEX_HTML, null, null);
+
+        this.httpAdapter.handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        verify(this.responseWriter).writeHttpResponse(this.mockedFileRequestDtoFound, this.httpResponseHeader, null);
+    }
+
+    @Test
+    public void expectToCallDirectoryHandling404WithoutHttpResponseBody() throws IOException {
+        HttpRequest incomingRequest = new HttpRequest("HEAD", ROOT_DIRECTORY, null, null);
+        when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY)).thenReturn(this.mockedDirectoryRequestDtoNotFound);
+
+        this.httpAdapter.handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        verify(this.responseWriter).respondeWith404(this.httpResponseHeader, null);
+    }
+
+    @Test
+    public void expectToCallDirectoryHandlingWithoutHttpResponseBody() throws IOException {
+        HttpRequest incomingRequest = new HttpRequest("HEAD", ROOT_DIRECTORY, null, null);
+        when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY)).thenReturn(this.mockedDirectoryRequestDtoFound);
+
+        this.httpAdapter.handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        verify(this.responseWriter).writeHttpResponse(this.mockedDirectoryRequestDtoFound, this.httpResponseHeader, null);
+    }
+
+
+
+
 
 
 }

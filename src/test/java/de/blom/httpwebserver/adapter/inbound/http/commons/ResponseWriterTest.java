@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -98,6 +99,19 @@ public class ResponseWriterTest {
 
         verify(this.dataOut).write(FILE_DATA, 0, FILE_LENGTH);
         verify(this.dataOut).flush();
+    }
+
+    @Test
+    public void expectToNotCallDataOut() throws IOException {
+        this.responseWriter.writeHttpResponse(this.out, null, FILE_LENGTH, CONTENT_TYPE_HTML, FILE_DATA, STATUS_CODE);
+
+        verify(this.responseWriter).writeResponseHeader(STATUS_CODE, this.out);
+        verify(this.responseWriter).writeResponseContentInformation(CONTENT_TYPE_HTML, FILE_LENGTH, this.out);
+
+        verify(this.out).flush();
+
+        verify(this.dataOut, never()).write(FILE_DATA, 0, FILE_LENGTH);
+        verify(this.dataOut, never()).flush();
     }
 
     @Test

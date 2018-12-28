@@ -1,8 +1,10 @@
 package de.blom.httpwebserver.domain.fileserver;
 
 import de.blom.httpwebserver.adapter.outbound.FileSystem;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,11 @@ public class DirectoryService {
             this.filesystem = new FileSystem(WEB_ROOT_DIR);
         }
 
+    }
+
+    public DirectoryService(FileSystem fileSystem, String directoryParam){
+        this(directoryParam);
+        this.filesystem = fileSystem;
     }
 
     public DirectoryService() {
