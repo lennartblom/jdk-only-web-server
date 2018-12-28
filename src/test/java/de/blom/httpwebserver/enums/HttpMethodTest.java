@@ -5,20 +5,20 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-public class HTTPMethodTest {
+public class HttpMethodTest {
 
     @Test
     public void expectToUppercaseGetValueToBeGetEnum(){
-        HTTPMethod value = HTTPMethod.valueOf("GET");
+        HttpMethod value = HttpMethod.valueOf("GET");
 
-        assertThat(value, is(HTTPMethod.GET));
+        assertThat(value, is(HttpMethod.GET));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void expectToThrowExepction(){
-        HTTPMethod value = HTTPMethod.valueOf("TEST");
+        HttpMethod value = HttpMethod.valueOf("TEST");
 
-        assertThat(value, is(HTTPMethod.GET));
+        assertThat(value, is(HttpMethod.GET));
     }
 
 }
