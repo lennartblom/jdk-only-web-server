@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -101,13 +102,26 @@ public class ResponseWriterTest {
     }
 
     @Test
+    public void expectToNotCallDataOut() throws IOException {
+        this.responseWriter.writeHttpResponse(this.out, null, FILE_LENGTH, CONTENT_TYPE_HTML, FILE_DATA, STATUS_CODE);
+
+        verify(this.responseWriter).writeResponseHeader(STATUS_CODE, this.out);
+        verify(this.responseWriter).writeResponseContentInformation(CONTENT_TYPE_HTML, FILE_LENGTH, this.out);
+
+        verify(this.out).flush();
+
+        verify(this.dataOut, never()).write(FILE_DATA, 0, FILE_LENGTH);
+        verify(this.dataOut, never()).flush();
+    }
+
+    @Test
     public void expectToWriteProperDirectoryHtmlList() throws IOException {
         DirectoryRequestDto directoryRequestDto = DirectoryRequestDto.builder()
                 .files(Collections.singletonList("index.html"))
                 .subdirectories(Collections.singletonList("subdirectory"))
                 .build();
 
-        String expectedHTML = "<ul><li><a href=\"subdirectory/\">subdirectory/</a></li><li><a href=\"index.html\">index.html</a></li></ul>";
+        String expectedHTML = "<ul><li>subdirectory/</li><li>index.html</li></ul>";
 
         this.responseWriter.writeHttpResponse(directoryRequestDto, this.out, this.dataOut);
 
