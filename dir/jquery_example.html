@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>My Sample</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script>
+        jQuery(document).ready(function(){
+            $('p').css({border: '5px solid red', color: 'green', padding: '20px'});
+
+            $('#countme').bind('click', function(){
+
+                var current = $(this).text();
+                $(this).text(parseInt(current, 20)+1);
+
+            }).css({
+                margin: '0 10em',
+                backgroundColor: '#ccc',
+                textAlign: 'center',
+                fontSize: '40px'
+            });
+        });
+    </script>
+</head>
+<body>
+
+<p>Hello</p>
+
+<p>World</p>
+
+<div id="countme">0</div>
+
+</body>
+</html>

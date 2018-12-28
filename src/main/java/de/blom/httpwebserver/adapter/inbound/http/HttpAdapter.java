@@ -148,10 +148,20 @@ public class HttpAdapter implements Runnable {
     void handleFileRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
         FileRequestDto fileRequestDto = this.directoryService.handleFileRequest(httpRequest.getUri());
 
+        // Todo test needed... and remove duplicate code
         if (!fileRequestDto.getFound()) {
-            this.responseWriter.respondeWith404(httpResponseHead, null);
+            if(httpRequest.getMethod() == HttpMethod.HEAD){
+                this.responseWriter.respondeWith404(httpResponseHead, null);
+            }else {
+                this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
+            }
         } else {
-            this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, null);
+            if(httpRequest.getMethod() == HttpMethod.HEAD){
+                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, null);
+            }else {
+                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, httpResponseBody);
+
+            }
         }
     }
 

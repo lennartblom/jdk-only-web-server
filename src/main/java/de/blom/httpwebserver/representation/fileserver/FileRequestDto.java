@@ -15,7 +15,7 @@ public class FileRequestDto {
     byte[] fileContent;
     int fileLength;
 
-    public FileRequestDto(Boolean found){
+    public FileRequestDto(Boolean found) {
         this.found = found;
     }
 }
