@@ -1,7 +1,7 @@
 package de.blom.httpwebserver.domain.wall;
 
 import com.mongodb.BasicDBObject;
-import de.blom.httpwebserver.adapter.outbound.MongoDb;
+import de.blom.httpwebserver.adapter.outbound.MongoDbRepository;
 import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +24,7 @@ public class WallContentServiceTest {
     private static final String TEXT = "Lorem ipsum dolor";
 
     @Mock
-    private MongoDb mongoDb;
+    private MongoDbRepository mongoDbRepository;
 
     @InjectMocks
     private WallContentService wallContentService;
@@ -37,7 +37,7 @@ public class WallContentServiceTest {
         this.wallContentService.createNewWallEntry(dto);
 
         ArgumentCaptor<BasicDBObject> varArgs = ArgumentCaptor.forClass(BasicDBObject.class);
-        verify(this.mongoDb).save(varArgs.capture());
+        verify(this.mongoDbRepository).save(varArgs.capture());
         BasicDBObject dbObject = varArgs.getValue();
         assertThat(dbObject.get("author"), is(AUTHOR));
         assertThat(dbObject.get("text"), is(TEXT));
