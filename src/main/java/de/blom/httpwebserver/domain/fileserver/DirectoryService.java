@@ -1,10 +1,10 @@
 package de.blom.httpwebserver.domain.fileserver;
 
 import de.blom.httpwebserver.adapter.outbound.FileSystem;
-import lombok.RequiredArgsConstructor;
+import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,10 @@ public class DirectoryService {
 
     public DirectoryService(String directoryParam) {
         if (directoryParam != null) {
-            log.info("Initializing DirectoryService with root directory='" + directoryParam + "'");
+            log.info("Initializing DirectoryService with root fileserver='" + directoryParam + "'");
             this.filesystem = new FileSystem(directoryParam);
         } else {
-            log.info("Initializing DirectoryService with root directory='" + WEB_ROOT_DIR + "'");
+            log.info("Initializing DirectoryService with root fileserver='" + WEB_ROOT_DIR + "'");
             this.filesystem = new FileSystem(WEB_ROOT_DIR);
         }
 
