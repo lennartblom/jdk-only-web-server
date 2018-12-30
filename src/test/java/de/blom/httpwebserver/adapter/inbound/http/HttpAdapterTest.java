@@ -2,12 +2,21 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
-import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.domain.wall.WallContentService;
+import de.blom.httpwebserver.enums.HttpMethod;
+import de.blom.httpwebserver.exception.NotFoundException;
+import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
+import de.blom.httpwebserver.exception.WrongContentTypeException;
+import de.blom.httpwebserver.exception.InvalidDataException;
+import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
-import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
+import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
+import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -17,6 +26,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,8 +40,9 @@ public class HttpAdapterTest {
 
 
     private static final String INDEX_HTML = "/index.html";
-    private static final String COMMENTS_URI = "/comments";
+    private static final String WALL_ENTRIES_URI = "/wall_entries";
     private static final String ROOT_DIRECTORY = "/";
+
 
     private HttpAdapter httpAdapter;
 
@@ -64,21 +76,24 @@ public class HttpAdapterTest {
     @Mock
     private FileRequestDto mockedFileRequestDtoFound;
 
+    @Mock
+    private WallContentService wallContentService;
+
+    @Mock
+    private HttpRequest httpRequest;
+
     @Before
     public void setup() {
-        this.httpAdapter = new HttpAdapter(this.mockedSocket, this.responseWriter, this.directoryService);
+
+        this.httpAdapter = new HttpAdapter(this.mockedSocket, this.responseWriter, this.directoryService, this.wallContentService);
         this.httpAdapter = Mockito.spy(this.httpAdapter);
 
-        this.mockedDirectoryRequestDtoNotFound = mock(DirectoryRequestDto.class);
         when(mockedDirectoryRequestDtoNotFound.getFound()).thenReturn(false);
 
-        this.mockedDirectoryRequestDtoFound = mock(DirectoryRequestDto.class);
         when(mockedDirectoryRequestDtoFound.getFound()).thenReturn(true);
 
-        this.mockedFileRequestDtoFound = mock(FileRequestDto.class);
         when(mockedFileRequestDtoFound.getFound()).thenReturn(false);
 
-        this.mockedFileRequestDtoFound = mock(FileRequestDto.class);
         when(mockedFileRequestDtoFound.getFound()).thenReturn(true);
     }
 
@@ -95,15 +110,17 @@ public class HttpAdapterTest {
 
     @Test
     public void expectToCallHandlePostMethod() throws IOException {
-        HttpRequest incomingRequest = new HttpRequest("POST", COMMENTS_URI, null, null);
+        HttpRequest incomingRequest = new HttpRequest("POST", WALL_ENTRIES_URI, null, null);
+        doNothing().when(this.httpAdapter).handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+
         this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
-        verify(this.httpAdapter).handlePostRequest(COMMENTS_URI);
+        verify(this.httpAdapter).handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test
     public void expectHandleNotSupportedMethodWith501() throws IOException {
-        HttpRequest incomingRequest = new HttpRequest("PUT", COMMENTS_URI, null, null);
+        HttpRequest incomingRequest = new HttpRequest("PUT", WALL_ENTRIES_URI, null, null);
         this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.responseWriter).respondeWith501(this.httpResponseHeader, this.httpResponseBody);
@@ -170,9 +187,109 @@ public class HttpAdapterTest {
         verify(this.responseWriter).writeHttpResponse(this.mockedDirectoryRequestDtoFound, this.httpResponseHeader, null);
     }
 
+    @Test
+    public void expectToCallDirectoryServiceWithSuitableDto() throws IOException {
+        String rawBody = "{\n" +
+                "\t\"author\": \"Max Mustermann\",\n" +
+                "\t\"text\": \"Lorem ipsum dolor\"\n" +
+                "}";
+
+        Map<String, String> correctHeader = new HashMap<>();
+        correctHeader.put("Content-Type", "application/json");
+
+        WallEntryInboundDto expectedIncomingDto = new WallEntryInboundDto("Max Mustermann", "Lorem ipsum dolor");
+        HttpRequest incomingRequest = new HttpRequest("POST", WALL_ENTRIES_URI, correctHeader, rawBody);
 
 
+        this.httpAdapter.handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
+
+        ArgumentCaptor<WallEntryInboundDto> varArgs = ArgumentCaptor.forClass(WallEntryInboundDto.class);
+        verify(this.wallContentService).createNewWallEntry(varArgs.capture());
+
+        assertThat(varArgs.getValue(), Matchers.samePropertyValuesAs(expectedIncomingDto));
+        verify(this.responseWriter).respondeWith201(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test(expected = WrongContentTypeException.class)
+    public void expectToThrowBadRequestException_contentTypeMissing() throws IOException {
+        Map<String, String> header = new HashMap<>();
+
+        HttpRequest incomingRequest = new HttpRequest("POST", WALL_ENTRIES_URI, header, "");
+
+        this.httpAdapter.handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test(expected = InvalidDataException.class)
+    public void expectToThrowBadRequestException_jsonContentIsWrong() throws IOException {
+        String rawBody = "{\n" +
+                "\t\"invalid\": \"Max Mustermann\",\n" +
+                "\t\"invalid_2\": \"Lorem ipsum dolor\"\n" +
+                "}";
+
+        Map<String, String> correctHeader = new HashMap<>();
+        correctHeader.put("Content-Type", "application/json");
+
+        HttpRequest incomingRequest = new HttpRequest("POST", WALL_ENTRIES_URI, correctHeader, rawBody);
+
+
+        this.httpAdapter.handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite400ResponseForInvalidDataException() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new InvalidDataException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith400(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite400ResponseForWrongContentTypeException() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new WrongContentTypeException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith400(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite404ResponseForNotFoundException() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new NotFoundException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith404(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite503ResponseForTimeout() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new ServiceNotAvaliableException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith503(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void expectToThrowNotFoundExceptionWrongPath() throws IOException {
+        when(this.httpRequest.getUri()).thenReturn("/unknown");
+
+        this.httpAdapter.handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+    }
 
 
 }

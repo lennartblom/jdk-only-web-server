@@ -2,10 +2,16 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
-import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.domain.wall.WallContentService;
+import de.blom.httpwebserver.exception.InvalidDataException;
+import de.blom.httpwebserver.exception.NotFoundException;
+import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
+import de.blom.httpwebserver.exception.WrongContentTypeException;
+import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
-import de.blom.httpwebserver.domain.fileserver.FileRequestDto;
+import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.enums.HttpMethod;
+import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -23,9 +29,11 @@ public class HttpAdapter implements Runnable {
     private ResponseWriter responseWriter;
     private Socket connect;
     private DirectoryService directoryService;
+    private WallContentService wallContentService;
 
 
     private HttpAdapter(Socket c, String directoryParam) {
+        this.wallContentService = new WallContentService();
         this.responseWriter = new ResponseWriter();
         this.connect = c;
         this.directoryService = new DirectoryService(directoryParam);
@@ -42,9 +50,10 @@ public class HttpAdapter implements Runnable {
         this.responseWriter = responseWriter;
     }
 
-    HttpAdapter(Socket c, ResponseWriter responseWriter, DirectoryService directoryService) {
+    HttpAdapter(Socket c, ResponseWriter responseWriter, DirectoryService directoryService, WallContentService wallContentService) {
         this(c, responseWriter);
         this.directoryService = directoryService;
+        this.wallContentService = wallContentService;
     }
 
     public static void main(String[] args) {
@@ -100,7 +109,19 @@ public class HttpAdapter implements Runnable {
     void handleHttpMethod(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, HttpRequest httpRequest) throws IOException {
         switch (httpRequest.getMethod()) {
             case POST:
-                this.handlePostRequest(httpRequest.getUri());
+                try {
+                    this.handlePostRequest(httpRequest, httpResponseHead, httpResponseBody);
+
+                }catch (InvalidDataException | WrongContentTypeException e){
+                    this.responseWriter.respondeWith400(httpResponseHead, httpResponseBody);
+
+                }catch (NotFoundException e){
+                    this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
+
+                }catch (ServiceNotAvaliableException e){
+                    this.responseWriter.respondeWith503(httpResponseHead, httpResponseBody);
+
+                }
                 break;
 
             case HEAD:
@@ -124,12 +145,20 @@ public class HttpAdapter implements Runnable {
         }
     }
 
-    void handlePostRequest(String uri) {
-        log.info("HTTP Request uri='" + uri + "'");
-        switch (uri) {
-            case "/comments":
-            case "/comments/":
+    void handlePostRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
+        log.info("HTTP Request uri='" + httpRequest + "'");
+
+        switch (httpRequest.getUri()) {
+            case "/wall_entries":
+            case "/wall_entries/":
                 log.info("Comment creation");
+                if(!httpRequest.isContentTypeApplicationJson()){
+                    throw new WrongContentTypeException();
+                }
+                WallEntryInboundDto dto = WallEntryInboundDto.parseFromRawJson(httpRequest.getRawBody());
+
+                this.wallContentService.createNewWallEntry(dto);
+                this.responseWriter.respondeWith201(httpResponseHead, httpResponseBody);
                 break;
 
             case "/comments/query":
@@ -138,17 +167,27 @@ public class HttpAdapter implements Runnable {
                 break;
 
             default:
-                break;
+                throw new NotFoundException();
         }
     }
 
     void handleFileRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
         FileRequestDto fileRequestDto = this.directoryService.handleFileRequest(httpRequest.getUri());
 
+        // Todo test needed... and remove duplicate code
         if (!fileRequestDto.getFound()) {
-            this.responseWriter.respondeWith404(httpResponseHead, null);
+            if(httpRequest.getMethod() == HttpMethod.HEAD){
+                this.responseWriter.respondeWith404(httpResponseHead, null);
+            }else {
+                this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
+            }
         } else {
-            this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, null);
+            if(httpRequest.getMethod() == HttpMethod.HEAD){
+                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, null);
+            }else {
+                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, httpResponseBody);
+
+            }
         }
     }
 

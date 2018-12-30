@@ -1,6 +1,6 @@
 package de.blom.httpwebserver.adapter.inbound.http.commons;
 
-import de.blom.httpwebserver.domain.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +52,9 @@ public class ResponseWriterTest {
     public void expectToCall200Method() {
         this.responseWriter.writeResponseHeader(HttpStatus.SC_OK, this.out);
 
-        verify(this.responseWriter).write200Response(this.out);
+        verify(this.out).println(eq("HTTP/1.1 200 OK"));
+        verify(this.out).println(eq(SERVER_INFO));
+        verify(this.out).println(eq("Date: " + this.currentDate));
     }
 
 
@@ -60,26 +62,38 @@ public class ResponseWriterTest {
     public void expectToCall501Method() {
         this.responseWriter.writeResponseHeader(HttpStatus.SC_NOT_IMPLEMENTED, this.out);
 
-        verify(this.responseWriter).write501Response(this.out);
-    }
-
-    @Test
-    public void expectToOutputCorrect200Status() {
-        this.responseWriter.write200Response(out);
-
-        verify(this.out).println(eq("HTTP/1.1 200 OK"));
-        verify(this.out).println(eq(SERVER_INFO));
-        verify(this.out).println(eq("Date: " + this.currentDate));
-    }
-
-    @Test
-    public void expectToOutputCorrect501Status() {
-        this.responseWriter.write501Response(out);
-
         verify(this.out).println(eq("HTTP/1.1 501 Not Implemented"));
         verify(this.out).println(eq(SERVER_INFO));
         verify(this.out).println(eq("Date: " + this.currentDate));
     }
+
+    @Test
+    public void expectToOutputCorrect400Status() {
+        this.responseWriter.writeResponseHeader(HttpStatus.SC_BAD_REQUEST, out);
+
+        verify(this.out).println(eq("HTTP/1.1 400 Bad Request"));
+        verify(this.out).println(eq(SERVER_INFO));
+        verify(this.out).println(eq("Date: " + this.currentDate));
+    }
+
+    @Test
+    public void expectToOutputCorrect503Status() {
+        this.responseWriter.writeResponseHeader(HttpStatus.SC_SERVICE_UNAVAILABLE, out);
+
+        verify(this.out).println(eq("HTTP/1.1 503 Service Unavailable"));
+        verify(this.out).println(eq(SERVER_INFO));
+        verify(this.out).println(eq("Date: " + this.currentDate));
+    }
+
+    @Test
+    public void expectToOutputCorrect201Status() {
+        this.responseWriter.writeResponseHeader(HttpStatus.SC_CREATED, out);
+
+        verify(this.out).println(eq("HTTP/1.1 201 Created"));
+        verify(this.out).println(eq(SERVER_INFO));
+        verify(this.out).println(eq("Date: " + this.currentDate));
+    }
+
 
     @Test
     public void expectToOutputCorrectContentInformation() {
@@ -127,6 +141,27 @@ public class ResponseWriterTest {
 
         verify(this.responseWriter).writeHttpResponse(out, dataOut, expectedHTML.getBytes().length, CONTENT_TYPE_HTML, expectedHTML.getBytes(), HttpStatus.SC_OK);
 
+    }
+
+    @Test
+    public void expectToWriterProper503Response() throws IOException {
+        this.responseWriter.respondeWith503(out, dataOut);
+
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.SERVICE_NOT_AVAILABLE.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
+    }
+
+    @Test
+    public void expectToWriterProper400Response() throws IOException {
+        this.responseWriter.respondeWith400(this.out, this.dataOut);
+
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.BAD_REQUEST.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void expectToWriterProper204Response() throws IOException {
+        this.responseWriter.respondeWith201(this.out, this.dataOut);
+
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.WALL_ENTRY_CREATED.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
     }
 
 
