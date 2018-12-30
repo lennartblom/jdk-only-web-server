@@ -1,7 +1,9 @@
 package de.blom.httpwebserver.adapter.inbound.http.commons;
 
+import com.google.gson.Gson;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
+import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
 import org.apache.commons.httpclient.HttpStatus;
 
 import java.io.BufferedOutputStream;
@@ -25,6 +27,14 @@ public class ResponseWriter {
         String contentType = fileRequestDto.getContentType();
         byte[] fileContent = fileRequestDto.getFileContent();
         this.writeHttpResponse(out, dataOut, fileLength, contentType, fileContent, HttpStatus.SC_OK);
+    }
+
+    public void writeHttpResponse(List<WallEntryOutboundDto> wallEntries, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+        String json = new Gson().toJson(wallEntries);
+        int contentLength = json.getBytes().length;
+        byte[] content = json.getBytes();
+
+        this.writeHttpResponse(out, dataOut, contentLength, "application/json", content, HttpStatus.SC_OK);
     }
 
     public void writeHttpResponse(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {

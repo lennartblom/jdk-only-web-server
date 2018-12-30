@@ -1,5 +1,6 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
+import com.google.gson.Gson;
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.wall.WallContentService;
@@ -12,11 +13,13 @@ import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.enums.HttpMethod;
 import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
+import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -151,7 +154,7 @@ public class HttpAdapter implements Runnable {
         switch (httpRequest.getUri()) {
             case "/wall_entries":
             case "/wall_entries/":
-                log.info("Comment creation");
+                log.info("WallEntry creation");
                 if(!httpRequest.isContentTypeApplicationJson()){
                     throw new WrongContentTypeException();
                 }
@@ -161,9 +164,13 @@ public class HttpAdapter implements Runnable {
                 this.responseWriter.respondeWith201(httpResponseHead, httpResponseBody);
                 break;
 
-            case "/comments/query":
-            case "/comments/query/":
-                log.info("Comment retrievement");
+            case "/wall_entries/query":
+            case "/wall_entries/query/":
+                log.info("WallEntry retrievement");
+
+                List<WallEntryOutboundDto> wallEntries = this.wallContentService.getAllEntries();
+                this.responseWriter.writeHttpResponse(wallEntries, httpResponseHead, httpResponseBody);
+
                 break;
 
             default:
