@@ -14,13 +14,18 @@ import java.util.List;
 
 public class ResponseWriter {
 
-    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li>%s/</li>";
-    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li>%s</li>";
+
     private static final String FILE_NOT_FOUND_HTML = "<h1>404 not Found</h1>";
     static final String BAD_REQUEST = "<h1>400 Bad Request</h1>";
     private static final String METHOD_NOT_IMPLEMENTED_HTML = "<h1>501 method not implemented</h1>";
     static final String SERVICE_NOT_AVAILABLE = "<h1>503 Service not available</h1>";
     static final String WALL_ENTRY_CREATED = "<h1>Wall entry created</h1>";
+
+    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li>%s/</li>";
+    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li>%s</li>";
+
+    private static final String TEXT_HTML = "text/html";
+    private static final String APPLICATION_JSON = "application/json";
 
     public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         int fileLength = fileRequestDto.getFileLength();
@@ -34,7 +39,7 @@ public class ResponseWriter {
         int contentLength = json.getBytes().length;
         byte[] content = json.getBytes();
 
-        this.writeHttpResponse(out, dataOut, contentLength, "application/json", content, HttpStatus.SC_OK);
+        this.writeHttpResponse(out, dataOut, contentLength, APPLICATION_JSON, content, HttpStatus.SC_OK);
     }
 
     public void writeHttpResponse(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
@@ -46,7 +51,7 @@ public class ResponseWriter {
 
         htmlDirectoryHtmlList.append("</ul>");
 
-        this.writeHttpResponse(out, dataOut, htmlDirectoryHtmlList.toString().getBytes().length, "text/html", htmlDirectoryHtmlList.toString().getBytes(), HttpStatus.SC_OK);
+        this.writeHttpResponse(out, dataOut, htmlDirectoryHtmlList.toString().getBytes().length, TEXT_HTML, htmlDirectoryHtmlList.toString().getBytes(), HttpStatus.SC_OK);
 
     }
 
@@ -101,34 +106,29 @@ public class ResponseWriter {
         writeServerAndDateInformation(httpResponseHead);
     }
 
-    public void writeResponseContentInformation(String contentType, int fileLength, PrintWriter httpResponseHead) {
+    void writeResponseContentInformation(String contentType, int fileLength, PrintWriter httpResponseHead) {
         httpResponseHead.println("Content-type: " + contentType);
         httpResponseHead.println("Content-length: " + fileLength);
     }
 
     public void respondeWith404(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(httpResponseHead, dataOut, FILE_NOT_FOUND_HTML.getBytes().length, "text/html", FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
+        this.writeHttpResponse(httpResponseHead, dataOut, FILE_NOT_FOUND_HTML.getBytes().length, TEXT_HTML, FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
     }
 
     public void respondeWith400(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
-        this.writeHttpResponse(httpResponseHead, httpResponseBody, BAD_REQUEST.getBytes().length, "text/html", BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
+        this.writeHttpResponse(httpResponseHead, httpResponseBody, BAD_REQUEST.getBytes().length, TEXT_HTML, BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
     }
 
     public void respondeWith503(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
-        this.writeHttpResponse(httpResponseHead, httpResponseBody, SERVICE_NOT_AVAILABLE.getBytes().length, "text/html", SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
+        this.writeHttpResponse(httpResponseHead, httpResponseBody, SERVICE_NOT_AVAILABLE.getBytes().length, TEXT_HTML, SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
     }
 
     public void respondeWith501(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(httpResponseHead, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, "text/html", METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
+        this.writeHttpResponse(httpResponseHead, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, TEXT_HTML, METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
     }
 
     public void respondeWith201(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(httpResponseHead, dataOut, WALL_ENTRY_CREATED.getBytes().length, "text/html", WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
-    }
-
-    void write404Response(PrintWriter httpResponseHead) {
-        httpResponseHead.println("HTTP/1.1 404 File Not Found");
-        this.writeServerAndDateInformation(httpResponseHead);
+        this.writeHttpResponse(httpResponseHead, dataOut, WALL_ENTRY_CREATED.getBytes().length, TEXT_HTML, WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
     }
 
     private void writeServerAndDateInformation(PrintWriter httpResponseHead) {
