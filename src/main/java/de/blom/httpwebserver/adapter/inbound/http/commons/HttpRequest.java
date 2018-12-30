@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 @Getter
 public class HttpRequest {
     private static final Logger log = Logger.getLogger(HttpRequest.class.getName());
-    private static final String APPLICATION_JSON = "application/json";
     private static final String CONTENT_TYPE = "Content-Type";
+    private static final String APPLICATION_JSON = "application/json";
 
     private HttpMethod method;
     private String uri;
