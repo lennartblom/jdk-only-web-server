@@ -12,6 +12,7 @@ import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
+import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +27,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -42,6 +45,7 @@ public class HttpAdapterTest {
     private static final String INDEX_HTML = "/index.html";
     private static final String WALL_ENTRIES_URI = "/wall_entries";
     private static final String ROOT_DIRECTORY = "/";
+    private static final String WALL_ENTRIES_QUERY = "/wall_entries/query";
 
 
     private HttpAdapter httpAdapter;
@@ -205,7 +209,7 @@ public class HttpAdapterTest {
 
 
         ArgumentCaptor<WallEntryInboundDto> varArgs = ArgumentCaptor.forClass(WallEntryInboundDto.class);
-        verify(this.wallContentService).createNewWallEntry(varArgs.capture());
+        verify(this.wallContentService).createNewEntry(varArgs.capture());
 
         assertThat(varArgs.getValue(), Matchers.samePropertyValuesAs(expectedIncomingDto));
         verify(this.responseWriter).respondeWith201(this.httpResponseHeader, this.httpResponseBody);
@@ -289,6 +293,20 @@ public class HttpAdapterTest {
         when(this.httpRequest.getUri()).thenReturn("/unknown");
 
         this.httpAdapter.handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToCallService() throws IOException {
+        when(this.httpRequest.getUri()).thenReturn(WALL_ENTRIES_QUERY);
+        List<WallEntryOutboundDto> mockedElements = Arrays.asList(mock(WallEntryOutboundDto.class), mock(WallEntryOutboundDto.class));
+        when(this.wallContentService.getAllEntries()).thenReturn(mockedElements);
+
+
+        this.httpAdapter.handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+
+        verify(this.responseWriter).writeHttpResponse(mockedElements, this.httpResponseHeader, this.httpResponseBody);
+        verify(this.wallContentService).getAllEntries();
     }
 
 
