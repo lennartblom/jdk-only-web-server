@@ -2,10 +2,13 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
+import de.blom.httpwebserver.domain.wall.WallContentService;
+import de.blom.httpwebserver.exception.WrongContentTypeException;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.enums.HttpMethod;
+import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -23,9 +26,11 @@ public class HttpAdapter implements Runnable {
     private ResponseWriter responseWriter;
     private Socket connect;
     private DirectoryService directoryService;
+    private WallContentService wallContentService;
 
 
     private HttpAdapter(Socket c, String directoryParam) {
+        this.wallContentService = new WallContentService();
         this.responseWriter = new ResponseWriter();
         this.connect = c;
         this.directoryService = new DirectoryService(directoryParam);
@@ -42,9 +47,10 @@ public class HttpAdapter implements Runnable {
         this.responseWriter = responseWriter;
     }
 
-    HttpAdapter(Socket c, ResponseWriter responseWriter, DirectoryService directoryService) {
+    HttpAdapter(Socket c, ResponseWriter responseWriter, DirectoryService directoryService, WallContentService wallContentService) {
         this(c, responseWriter);
         this.directoryService = directoryService;
+        this.wallContentService = wallContentService;
     }
 
     public static void main(String[] args) {
@@ -100,7 +106,7 @@ public class HttpAdapter implements Runnable {
     void handleHttpMethod(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, HttpRequest httpRequest) throws IOException {
         switch (httpRequest.getMethod()) {
             case POST:
-                this.handlePostRequest(httpRequest);
+                this.handlePostRequest(httpRequest, httpResponseHead, httpResponseBody);
                 break;
 
             case HEAD:
@@ -124,14 +130,18 @@ public class HttpAdapter implements Runnable {
         }
     }
 
-    void handlePostRequest(HttpRequest httpRequest) {
+    void handlePostRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) {
         log.info("HTTP Request uri='" + httpRequest + "'");
 
         switch (httpRequest.getUri()) {
-            case "/comments":
-            case "/comments/":
+            case "/wall_entries":
+            case "/wall_entries/":
                 log.info("Comment creation");
-
+                if(!httpRequest.isContentTypeApplicationJson()){
+                    throw new WrongContentTypeException("No application/json content type");
+                }
+                WallEntryInboundDto dto = WallEntryInboundDto.parseFromRawJson(httpRequest.getRawBody());
+                this.wallContentService.createNewWallEntry(dto);
 
                 break;
 
