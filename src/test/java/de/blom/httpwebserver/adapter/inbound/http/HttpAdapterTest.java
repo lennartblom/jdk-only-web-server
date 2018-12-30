@@ -188,7 +188,7 @@ public class HttpAdapterTest {
     }
 
     @Test
-    public void expectToCallDirectoryServiceWithSuitableDto() {
+    public void expectToCallDirectoryServiceWithSuitableDto() throws IOException {
         String rawBody = "{\n" +
                 "\t\"author\": \"Max Mustermann\",\n" +
                 "\t\"text\": \"Lorem ipsum dolor\"\n" +
@@ -208,10 +208,11 @@ public class HttpAdapterTest {
         verify(this.wallContentService).createNewWallEntry(varArgs.capture());
 
         assertThat(varArgs.getValue(), Matchers.samePropertyValuesAs(expectedIncomingDto));
+        verify(this.responseWriter).respondeWith201(this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test(expected = WrongContentTypeException.class)
-    public void expectToThrowBadRequestException_contentTypeMissing() {
+    public void expectToThrowBadRequestException_contentTypeMissing() throws IOException {
         Map<String, String> header = new HashMap<>();
 
         HttpRequest incomingRequest = new HttpRequest("POST", WALL_ENTRIES_URI, header, "");
@@ -220,7 +221,7 @@ public class HttpAdapterTest {
     }
 
     @Test(expected = InvalidDataException.class)
-    public void expectToThrowBadRequestException_jsonContentIsWrong() {
+    public void expectToThrowBadRequestException_jsonContentIsWrong() throws IOException {
         String rawBody = "{\n" +
                 "\t\"invalid\": \"Max Mustermann\",\n" +
                 "\t\"invalid_2\": \"Lorem ipsum dolor\"\n" +
@@ -284,7 +285,7 @@ public class HttpAdapterTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void expectToThrowNotFoundExceptionWrongPath(){
+    public void expectToThrowNotFoundExceptionWrongPath() throws IOException {
         when(this.httpRequest.getUri()).thenReturn("/unknown");
 
         this.httpAdapter.handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);

@@ -18,6 +18,7 @@ public class ResponseWriter {
     static final String BAD_REQUEST = "<h1>400 Bad Request</h1>";
     private static final String METHOD_NOT_IMPLEMENTED_HTML = "<h1>501 method not implemented</h1>";
     static final String SERVICE_NOT_AVAILABLE = "<h1>503 Service not available</h1>";
+    static final String WALL_ENTRY_CREATED = "<h1>Wall entry created</h1>";
 
     public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         int fileLength = fileRequestDto.getFileLength();
@@ -80,6 +81,9 @@ public class ResponseWriter {
             case HttpStatus.SC_SERVICE_UNAVAILABLE:
                 httpResponseHead.println("HTTP/1.1 503 Service Unavailable");
                 break;
+            case HttpStatus.SC_CREATED:
+                httpResponseHead.println("HTTP/1.1 201 Created");
+                break;
             default:
                 break;
         }
@@ -90,16 +94,6 @@ public class ResponseWriter {
     public void writeResponseContentInformation(String contentType, int fileLength, PrintWriter httpResponseHead) {
         httpResponseHead.println("Content-type: " + contentType);
         httpResponseHead.println("Content-length: " + fileLength);
-    }
-
-    void write501Response(PrintWriter out) {
-        out.println("HTTP/1.1 501 Not Implemented");
-        writeServerAndDateInformation(out);
-    }
-
-    void write200Response(PrintWriter out) {
-        out.println("HTTP/1.1 200 OK");
-        writeServerAndDateInformation(out);
     }
 
     public void respondeWith404(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
@@ -116,6 +110,10 @@ public class ResponseWriter {
 
     public void respondeWith501(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
         this.writeHttpResponse(httpResponseHead, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, "text/html", METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
+    }
+
+    public void respondeWith201(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
+        this.writeHttpResponse(httpResponseHead, dataOut, WALL_ENTRY_CREATED.getBytes().length, "text/html", WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
     }
 
     void write404Response(PrintWriter httpResponseHead) {

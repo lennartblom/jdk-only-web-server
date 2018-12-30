@@ -145,7 +145,7 @@ public class HttpAdapter implements Runnable {
         }
     }
 
-    void handlePostRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) {
+    void handlePostRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
         log.info("HTTP Request uri='" + httpRequest + "'");
 
         switch (httpRequest.getUri()) {
@@ -156,8 +156,9 @@ public class HttpAdapter implements Runnable {
                     throw new WrongContentTypeException();
                 }
                 WallEntryInboundDto dto = WallEntryInboundDto.parseFromRawJson(httpRequest.getRawBody());
-                this.wallContentService.createNewWallEntry(dto);
 
+                this.wallContentService.createNewWallEntry(dto);
+                this.responseWriter.respondeWith201(httpResponseHead, httpResponseBody);
                 break;
 
             case "/comments/query":

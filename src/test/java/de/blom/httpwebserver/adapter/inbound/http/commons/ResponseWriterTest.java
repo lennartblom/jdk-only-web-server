@@ -85,6 +85,15 @@ public class ResponseWriterTest {
         verify(this.out).println(eq("Date: " + this.currentDate));
     }
 
+    @Test
+    public void expectToOutputCorrect201Status() {
+        this.responseWriter.writeResponseHeader(HttpStatus.SC_CREATED, out);
+
+        verify(this.out).println(eq("HTTP/1.1 201 Created"));
+        verify(this.out).println(eq(SERVER_INFO));
+        verify(this.out).println(eq("Date: " + this.currentDate));
+    }
+
 
     @Test
     public void expectToOutputCorrectContentInformation() {
@@ -146,6 +155,13 @@ public class ResponseWriterTest {
         this.responseWriter.respondeWith400(this.out, this.dataOut);
 
         verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.BAD_REQUEST.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void expectToWriterProper204Response() throws IOException {
+        this.responseWriter.respondeWith201(this.out, this.dataOut);
+
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.WALL_ENTRY_CREATED.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
     }
 
 
