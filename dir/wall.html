@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wall</title>
+    <style type="text/css">
+        * {
+            font-family: "Adobe Garamond Pro", serif;
+        }
+
+        #wall {
+            padding: 5px;
+        }
+
+        #wall > div.wall_entry {
+            display: block;
+            float: left;
+            width: 45%;
+            border: thin dimgray solid;
+            padding: 15px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+
+        #wall .author {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #wall .creation {
+            font-size: 14px;
+            font-weight: normal;
+            font-style: italic;
+            color: dimgray;
+        }
+
+        #wall .text {
+
+        }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script>
+        jQuery(document).ready(function () {
+            var ENTRY_CREATION_URL = "http://localhost:8080/wall_entries/query";
+
+            $.post(ENTRY_CREATION_URL,
+                null,
+                function (data, status) {
+                    if (status === "success") {
+                        var wall = $("div#wall");
+                        wall.empty();
+                        $.each(data, function (index, value) {
+                            var entry_number = index + 1;
+
+                            wall.append("<div class=\"wall_entry\">\n" +
+                                "        <div class=\"author\">#" + entry_number + " " + value.author + "</div>\n" +
+                                "        <div class=\"creation\">" + value.created + "</div>\n" +
+                                "        <div class=\"text\">" + value.text + "</div>\n" +
+                                "    </div>")
+                        });
+
+
+                    }
+                });
+        });
+    </script>
+</head>
+<body>
+<h1>Wall overview</h1>
+<p>Here is an overview of existing wall entries.</p>
+<p>If you want to create your own. Head over to the <a href="http://localhost:8080/wall_entry_creation.html">creation
+    page</a>.</p>
+<div id="wall">
+    <h2>Apparently there is no entry here yet.</h2>
+</div>
+
+</body>
+</html>
