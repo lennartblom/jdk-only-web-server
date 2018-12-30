@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wall</title>
+    <style type="text/css">
+        * {
+            font-family: "Adobe Garamond Pro", serif;
+        }
+
+        #wall {
+            padding: 5px;
+        }
+
+        #wall > div.wall_entry {
+            display: block;
+            float: left;
+            width: 45%;
+            border: thin dimgray solid;
+            padding: 15px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+
+        #wall .author {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #wall .creation {
+            font-size: 14px;
+            font-weight: normal;
+            font-style: italic;
+            color: dimgray;
+        }
+
+        #wall .text {
+
+        }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script>
+        jQuery(document).ready(function () {
+            var ENTRY_CREATION_URL = "http://localhost:8080/wall_entries";
+
+            $('#wall_entry_submit').bind('click', function () {
+
+                var author_field = $('#wall_entry_author');
+                var author_value = author_field.val();
+
+                var text_field = $('#wall_entry_text');
+                var text_value = text_field.val();
+
+                if (author_value !== undefined && author_value !== "" && text_value !== undefined && text_value !== "") {
+                    var jsonData = {
+                        author: author_value,
+                        text: text_value
+                    };
+                    var stringContent = JSON.stringify(jsonData) + "\n";
+
+                    $.ajax({
+                        url: ENTRY_CREATION_URL,
+                        type: 'post',
+                        data: stringContent,
+                        contentType: 'application/json',
+                        success: function () {
+
+                            author_field.val("");
+                            text_field.val("");
+
+                            alert("Congrats. Wall entry created!");
+                        }
+
+                    });
+
+                } else {
+                    alert("Sorry. Your name and text must not be empty or blank!")
+                }
+            });
+
+
+        });
+    </script>
+</head>
+<body>
+<h1>Wall entry creation</h1>
+<p>You want to get an entry on the <a href="http://localhost:8080/wall.html">wall</a>?</p>
+<p>Feel free to submit your entry. Just leave your name and text.</p>
+
+<form>
+    <table>
+        <tbody>
+        <tr>
+            <td>Name</td>
+            <td><input id="wall_entry_author" type="text"></td>
+        </tr>
+        <tr>
+
+            <td>Text</td>
+            <td>
+                <textarea id="wall_entry_text"></textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<button id="wall_entry_submit" type="button">Submit wall entry</button>
+
+</body>
+</html>
