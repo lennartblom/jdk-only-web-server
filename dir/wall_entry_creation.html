@@ -43,22 +43,6 @@
         jQuery(document).ready(function () {
             var ENTRY_CREATION_URL = "http://localhost:8080/wall_entries";
 
-            var handle200 = function (data, textStatus, jqXHR) {
-                alert('200'); // success codes have the success signature
-            };
-
-            var handle201 = function (data, textStatus, jqXHR) {
-                alert('201'); // success codes have the success signature
-                // test it if you are in doubt:
-                console.log(data);
-                console.log(textStatus);
-                console.log(jqXHR);
-            };
-
-            var handle404 = function (jqXHR, textStatus, errorThrown) {
-                alert('404'); // failing codes have the error signature
-            };
-
             $('#wall_entry_submit').bind('click', function () {
 
                 var author_field = $('#wall_entry_author');
@@ -72,8 +56,7 @@
                         author: author_value,
                         text: text_value
                     };
-                    var stringContent = JSON.stringify(jsonData);
-                    stringContent = stringContent + "\n";
+                    var stringContent = JSON.stringify(jsonData) + "\n";
 
                     $.ajax({
                         url: ENTRY_CREATION_URL,
@@ -87,16 +70,6 @@
 
                             alert("Congrats. Wall entry created!");
                         }
-                        /*201: function(data, textStatus, jqXHR) {
-                            alert("Congrats. Wall entry created!");
-                            author_field.empty();
-                            text_value.empty();
-
-                            alert("Congrats. Wall entry created!");
-                        },
-                        503: function(data, textStatus, jqXHR) {
-                            alert("Service not available");
-                        }*/
 
                     });
 
