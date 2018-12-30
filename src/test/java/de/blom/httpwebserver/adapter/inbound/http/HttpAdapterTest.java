@@ -1,10 +1,12 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
+import com.mongodb.MongoTimeoutException;
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.wall.WallContentService;
 import de.blom.httpwebserver.enums.HttpMethod;
 import de.blom.httpwebserver.exception.NotFoundException;
+import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
 import de.blom.httpwebserver.exception.WrongContentTypeException;
 import de.blom.httpwebserver.exception.InvalidDataException;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
@@ -268,6 +270,18 @@ public class HttpAdapterTest {
         this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
         verify(this.responseWriter).respondeWith404(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite502ResponseForTimeout() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new ServiceNotAvaliableException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith502(this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test(expected = NotFoundException.class)

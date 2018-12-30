@@ -100,6 +100,10 @@ public class ResponseWriter {
         // TODO to be tested and filled
     }
 
+    public void respondeWith502(PrintWriter httpResponseHeader, BufferedOutputStream httpResponseBody) {
+        // TODO to be tested and filled
+    }
+
     public void respondeWith501(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
         this.writeHttpResponse(httpResponseHead, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, "text/html", METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
     }
@@ -117,4 +121,6 @@ public class ResponseWriter {
     Date getCurrentDate() {
         return new Date();
     }
+
+
 }

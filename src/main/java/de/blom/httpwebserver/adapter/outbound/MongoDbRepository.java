@@ -1,14 +1,15 @@
 package de.blom.httpwebserver.adapter.outbound;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
 
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MongoDbRepository {
+
+    private static final Logger log = Logger.getLogger(MongoDbRepository.class.getName());
 
     private static final String MONGODB_COLLECTION_NAME = "wallentries";
     private static final String MONGODB_DB_NAME = "JDKOnlyWebserver";
@@ -26,6 +27,12 @@ public class MongoDbRepository {
     }
 
     public void save(BasicDBObject object) {
-        this.dbCollection.save(object);
+        try {
+            this.dbCollection.save(object);
+        }catch (MongoTimeoutException e){
+            log.log(Level.SEVERE, "Mongo DB not available", e);
+            throw new ServiceNotAvaliableException();
+        }
+
     }
 }
