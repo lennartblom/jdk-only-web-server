@@ -1,6 +1,5 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
-import com.mongodb.MongoTimeoutException;
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.wall.WallContentService;
@@ -273,7 +272,7 @@ public class HttpAdapterTest {
     }
 
     @Test
-    public void expectToWrite502ResponseForTimeout() throws IOException {
+    public void expectToWrite503ResponseForTimeout() throws IOException {
         when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
         doThrow(new ServiceNotAvaliableException())
                 .when(this.httpAdapter)
@@ -281,7 +280,7 @@ public class HttpAdapterTest {
 
         this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
-        verify(this.responseWriter).respondeWith502(this.httpResponseHeader, this.httpResponseBody);
+        verify(this.responseWriter).respondeWith503(this.httpResponseHeader, this.httpResponseBody);
     }
 
     @Test(expected = NotFoundException.class)

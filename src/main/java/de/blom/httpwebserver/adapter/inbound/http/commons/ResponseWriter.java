@@ -15,7 +15,9 @@ public class ResponseWriter {
     private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li>%s/</li>";
     private static final String FILE_LIST_ENTRY_TEMPLATE = "<li>%s</li>";
     private static final String FILE_NOT_FOUND_HTML = "<h1>404 not Found</h1>";
+    static final String BAD_REQUEST = "<h1>400 Bad Request</h1>";
     private static final String METHOD_NOT_IMPLEMENTED_HTML = "<h1>501 method not implemented</h1>";
+    static final String SERVICE_NOT_AVAILABLE = "<h1>503 Service not available</h1>";
 
     public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         int fileLength = fileRequestDto.getFileLength();
@@ -60,21 +62,29 @@ public class ResponseWriter {
     void writeResponseHeader(int httpStatus, PrintWriter httpResponseHead) {
         switch (httpStatus) {
             case HttpStatus.SC_NOT_FOUND:
-                this.write404Response(httpResponseHead);
+                httpResponseHead.println("HTTP/1.1 404 File Not Found");
                 break;
 
             case HttpStatus.SC_OK:
-                this.write200Response(httpResponseHead);
+                httpResponseHead.println("HTTP/1.1 200 OK");
                 break;
 
             case HttpStatus.SC_NOT_IMPLEMENTED:
-                this.write501Response(httpResponseHead);
+                httpResponseHead.println("HTTP/1.1 501 Not Implemented");
                 break;
 
-            default:
+            case HttpStatus.SC_BAD_REQUEST:
+                httpResponseHead.println("HTTP/1.1 400 Bad Request");
+                break;
 
+            case HttpStatus.SC_SERVICE_UNAVAILABLE:
+                httpResponseHead.println("HTTP/1.1 503 Service Unavailable");
+                break;
+            default:
                 break;
         }
+
+        writeServerAndDateInformation(httpResponseHead);
     }
 
     public void writeResponseContentInformation(String contentType, int fileLength, PrintWriter httpResponseHead) {
@@ -96,12 +106,12 @@ public class ResponseWriter {
         this.writeHttpResponse(httpResponseHead, dataOut, FILE_NOT_FOUND_HTML.getBytes().length, "text/html", FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
     }
 
-    public void respondeWith400(PrintWriter httpResponseHead, BufferedOutputStream dataOut) {
-        // TODO to be tested and filled
+    public void respondeWith400(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
+        this.writeHttpResponse(httpResponseHead, httpResponseBody, BAD_REQUEST.getBytes().length, "text/html", BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
     }
 
-    public void respondeWith502(PrintWriter httpResponseHeader, BufferedOutputStream httpResponseBody) {
-        // TODO to be tested and filled
+    public void respondeWith503(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
+        this.writeHttpResponse(httpResponseHead, httpResponseBody, SERVICE_NOT_AVAILABLE.getBytes().length, "text/html", SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
     }
 
     public void respondeWith501(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {

@@ -114,12 +114,12 @@ public class HttpAdapter implements Runnable {
 
                 }catch (InvalidDataException | WrongContentTypeException e){
                     this.responseWriter.respondeWith400(httpResponseHead, httpResponseBody);
-                    
+
                 }catch (NotFoundException e){
                     this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
 
                 }catch (ServiceNotAvaliableException e){
-                    this.responseWriter.respondeWith502(httpResponseHead, httpResponseBody);
+                    this.responseWriter.respondeWith503(httpResponseHead, httpResponseBody);
 
                 }
                 break;
