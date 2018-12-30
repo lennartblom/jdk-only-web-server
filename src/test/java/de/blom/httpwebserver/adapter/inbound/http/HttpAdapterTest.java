@@ -205,7 +205,7 @@ public class HttpAdapterTest {
 
 
         ArgumentCaptor<WallEntryInboundDto> varArgs = ArgumentCaptor.forClass(WallEntryInboundDto.class);
-        verify(this.wallContentService).createNewWallEntry(varArgs.capture());
+        verify(this.wallContentService).createNewEntry(varArgs.capture());
 
         assertThat(varArgs.getValue(), Matchers.samePropertyValuesAs(expectedIncomingDto));
         verify(this.responseWriter).respondeWith201(this.httpResponseHeader, this.httpResponseBody);

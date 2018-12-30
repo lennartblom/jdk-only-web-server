@@ -157,7 +157,7 @@ public class HttpAdapter implements Runnable {
                 }
                 WallEntryInboundDto dto = WallEntryInboundDto.parseFromRawJson(httpRequest.getRawBody());
 
-                this.wallContentService.createNewWallEntry(dto);
+                this.wallContentService.createNewEntry(dto);
                 this.responseWriter.respondeWith201(httpResponseHead, httpResponseBody);
                 break;
 

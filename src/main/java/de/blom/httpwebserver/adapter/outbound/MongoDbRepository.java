@@ -4,6 +4,8 @@ import com.mongodb.*;
 import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,5 +36,20 @@ public class MongoDbRepository {
             throw new ServiceNotAvaliableException();
         }
 
+    }
+
+    public List<DBObject> getAll() {
+        List<DBObject> rawObjects = new ArrayList<>();
+        try {
+            DBCursor dbCursor = this.dbCollection.find();
+            while (dbCursor.hasNext()){
+                rawObjects.add(dbCursor.next());
+            }
+            return rawObjects;
+
+        }catch (MongoTimeoutException e){
+            log.log(Level.SEVERE, "Mongo DB not available", e);
+            throw new ServiceNotAvaliableException();
+        }
     }
 }
