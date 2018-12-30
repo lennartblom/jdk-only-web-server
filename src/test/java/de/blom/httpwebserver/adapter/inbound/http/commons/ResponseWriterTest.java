@@ -1,6 +1,8 @@
 package de.blom.httpwebserver.adapter.inbound.http.commons;
 
+import com.google.gson.Gson;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +14,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -27,6 +31,8 @@ public class ResponseWriterTest {
     private static final byte[] FILE_DATA = new byte[52];
     private static final int STATUS_CODE = HttpStatus.SC_OK;
     private static final String CONTENT_TYPE_HTML = "text/html";
+
+    private static final String CONTENT_TYPE_JSON = "application/json";
 
     private static final String SERVER_INFO = "Server: Java HTTP Server";
     private static final String TEXT_HTML = "text/html";
@@ -162,6 +168,32 @@ public class ResponseWriterTest {
         this.responseWriter.respondeWith201(this.out, this.dataOut);
 
         verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.WALL_ENTRY_CREATED.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
+    }
+
+    @Test
+    public void expectToWriteProperJsonFromDtoList() throws IOException {
+        Date testDate = new Date();
+
+        WallEntryOutboundDto entry1 = WallEntryOutboundDto.builder()
+                .author("Max")
+                .text("Test 1")
+                .created(testDate)
+                .build();
+
+        WallEntryOutboundDto entry2 = WallEntryOutboundDto.builder()
+                .author("Mustermann")
+                .text("Test 2")
+                .created(testDate)
+                .build();
+
+        List<WallEntryOutboundDto> list = Arrays.asList(entry1, entry2);
+        final String expectedJson = new Gson().toJson(list);
+
+
+        this.responseWriter.writeHttpResponse(list, this.out, this.dataOut);
+
+
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, expectedJson.getBytes().length, CONTENT_TYPE_JSON, expectedJson.getBytes(), HttpStatus.SC_OK);
     }
 
 
