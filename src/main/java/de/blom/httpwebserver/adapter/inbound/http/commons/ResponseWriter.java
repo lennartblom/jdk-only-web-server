@@ -96,6 +96,10 @@ public class ResponseWriter {
         this.writeHttpResponse(httpResponseHead, dataOut, FILE_NOT_FOUND_HTML.getBytes().length, "text/html", FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
     }
 
+    public void respondeWith400(PrintWriter httpResponseHead, BufferedOutputStream dataOut) {
+        // TODO to be tested and filled
+    }
+
     public void respondeWith501(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
         this.writeHttpResponse(httpResponseHead, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, "text/html", METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
     }

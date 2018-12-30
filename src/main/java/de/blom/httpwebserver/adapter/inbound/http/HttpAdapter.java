@@ -3,6 +3,8 @@ package de.blom.httpwebserver.adapter.inbound.http;
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.wall.WallContentService;
+import de.blom.httpwebserver.exception.InvalidDataException;
+import de.blom.httpwebserver.exception.NotFoundException;
 import de.blom.httpwebserver.exception.WrongContentTypeException;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
@@ -106,7 +108,14 @@ public class HttpAdapter implements Runnable {
     void handleHttpMethod(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, HttpRequest httpRequest) throws IOException {
         switch (httpRequest.getMethod()) {
             case POST:
-                this.handlePostRequest(httpRequest, httpResponseHead, httpResponseBody);
+                try {
+                    this.handlePostRequest(httpRequest, httpResponseHead, httpResponseBody);
+
+                }catch (InvalidDataException | WrongContentTypeException e){
+                    this.responseWriter.respondeWith400(httpResponseHead, httpResponseBody);
+                }catch (NotFoundException e){
+                    this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
+                }
                 break;
 
             case HEAD:
@@ -138,7 +147,7 @@ public class HttpAdapter implements Runnable {
             case "/wall_entries/":
                 log.info("Comment creation");
                 if(!httpRequest.isContentTypeApplicationJson()){
-                    throw new WrongContentTypeException("No application/json content type");
+                    throw new WrongContentTypeException();
                 }
                 WallEntryInboundDto dto = WallEntryInboundDto.parseFromRawJson(httpRequest.getRawBody());
                 this.wallContentService.createNewWallEntry(dto);
@@ -151,7 +160,7 @@ public class HttpAdapter implements Runnable {
                 break;
 
             default:
-                break;
+                throw new NotFoundException();
         }
     }
 

@@ -3,6 +3,8 @@ package de.blom.httpwebserver.adapter.inbound.http;
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.wall.WallContentService;
+import de.blom.httpwebserver.enums.HttpMethod;
+import de.blom.httpwebserver.exception.NotFoundException;
 import de.blom.httpwebserver.exception.WrongContentTypeException;
 import de.blom.httpwebserver.exception.InvalidDataException;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
@@ -75,6 +77,9 @@ public class HttpAdapterTest {
 
     @Mock
     private WallContentService wallContentService;
+
+    @Mock
+    private HttpRequest httpRequest;
 
     @Before
     public void setup() {
@@ -227,6 +232,49 @@ public class HttpAdapterTest {
 
 
         this.httpAdapter.handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite400ResponseForInvalidDataException() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new InvalidDataException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith400(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite400ResponseForWrongContentTypeException() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new WrongContentTypeException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith400(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test
+    public void expectToWrite404ResponseForNotFoundException() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.POST);
+        doThrow(new NotFoundException())
+                .when(this.httpAdapter)
+                .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith404(this.httpResponseHeader, this.httpResponseBody);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void expectToThrowNotFoundExceptionWrongPath(){
+        when(this.httpRequest.getUri()).thenReturn("/unknown");
+
+        this.httpAdapter.handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
     }
 
 
