@@ -1,7 +1,6 @@
 package de.blom.httpwebserver.domain.wall;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
 import lombok.Getter;
 

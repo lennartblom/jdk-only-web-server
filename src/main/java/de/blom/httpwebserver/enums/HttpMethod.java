@@ -5,5 +5,4 @@ public enum HttpMethod {
     HEAD,
     POST,
     NOT_IMPLEMENTED_YET
-
 }

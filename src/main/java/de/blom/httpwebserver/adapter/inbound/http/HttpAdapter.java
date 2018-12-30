@@ -1,17 +1,16 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
-import com.google.gson.Gson;
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
+import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.domain.wall.WallContentService;
+import de.blom.httpwebserver.enums.HttpMethod;
 import de.blom.httpwebserver.exception.InvalidDataException;
 import de.blom.httpwebserver.exception.NotFoundException;
 import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
 import de.blom.httpwebserver.exception.WrongContentTypeException;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
-import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
-import de.blom.httpwebserver.enums.HttpMethod;
 import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
 import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
 
