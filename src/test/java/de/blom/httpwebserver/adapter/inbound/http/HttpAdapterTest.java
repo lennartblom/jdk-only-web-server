@@ -168,7 +168,7 @@ public class HttpAdapterTest {
 
         this.httpAdapter.handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        verify(this.responseWriter).writeHttpResponse(this.mockedFileRequestDtoFound, this.httpResponseHeader, null);
+        verify(this.responseWriter).writeHttpResponseWithFileData(this.mockedFileRequestDtoFound, this.httpResponseHeader, null);
     }
 
     @Test
@@ -188,7 +188,7 @@ public class HttpAdapterTest {
 
         this.httpAdapter.handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        verify(this.responseWriter).writeHttpResponse(this.mockedDirectoryRequestDtoFound, this.httpResponseHeader, null);
+        verify(this.responseWriter).writeHttpResponseWithDirectoryData(this.mockedDirectoryRequestDtoFound, this.httpResponseHeader, null);
     }
 
     @Test

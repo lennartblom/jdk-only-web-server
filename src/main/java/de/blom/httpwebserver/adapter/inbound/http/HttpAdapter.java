@@ -61,7 +61,7 @@ public class HttpAdapter implements Runnable {
     public static void main(String[] args) {
         try {
             ServerSocket serverConnect = new ServerSocket(PORT);
-            log.info("Server started.\nListening for connections on port : " + PORT + " ...\n");
+            log.info("HTTP Adapter started.\nWaiting for incoming connections on port '" + PORT + "' ...\n");
 
             String directoryParam = null;
             if(args.length == 1){
@@ -72,15 +72,14 @@ public class HttpAdapter implements Runnable {
                 HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept(), directoryParam);
 
                 if (VERBOSE) {
-                    log.info("Connection opened. (" + new Date() + ")");
+                    log.info("New connection opened");
                 }
 
-                // create dedicated thread to manage the client connection
                 Thread thread = new Thread(httpAdapter);
                 thread.start();
             }
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Server Connection error : " + e.getMessage(), e);
+            log.log(Level.SEVERE, "A Server Connection error occured: " + e.getMessage(), e);
         }
     }
 
@@ -189,9 +188,9 @@ public class HttpAdapter implements Runnable {
             }
         } else {
             if(httpRequest.getMethod() == HttpMethod.HEAD){
-                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, null);
+                this.responseWriter.writeHttpResponseWithFileData(fileRequestDto, httpResponseHead, null);
             }else {
-                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, httpResponseBody);
+                this.responseWriter.writeHttpResponseWithFileData(fileRequestDto, httpResponseHead, httpResponseBody);
 
             }
         }
@@ -208,9 +207,9 @@ public class HttpAdapter implements Runnable {
 
         } else {
             if(httpRequest.getMethod() == HttpMethod.HEAD){
-                this.responseWriter.writeHttpResponse(directoryRequestDto, httpResponseHead, null);
+                this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, httpResponseHead, null);
             }else {
-                this.responseWriter.writeHttpResponse(directoryRequestDto, httpResponseHead, httpResponseBody);
+                this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, httpResponseHead, httpResponseBody);
             }
 
         }

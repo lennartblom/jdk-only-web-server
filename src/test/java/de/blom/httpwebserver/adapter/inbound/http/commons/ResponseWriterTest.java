@@ -143,7 +143,7 @@ public class ResponseWriterTest {
 
         String expectedHTML = "<ul><li>subdirectory/</li><li>index.html</li></ul>";
 
-        this.responseWriter.writeHttpResponse(directoryRequestDto, this.out, this.dataOut);
+        this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, this.out, this.dataOut);
 
         verify(this.responseWriter).writeHttpResponse(out, dataOut, expectedHTML.getBytes().length, CONTENT_TYPE_HTML, expectedHTML.getBytes(), HttpStatus.SC_OK);
 

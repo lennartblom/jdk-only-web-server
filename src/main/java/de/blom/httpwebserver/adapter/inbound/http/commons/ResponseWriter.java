@@ -27,7 +27,7 @@ public class ResponseWriter {
     private static final String TEXT_HTML = "text/html";
     private static final String APPLICATION_JSON = "application/json";
 
-    public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+    public void writeHttpResponseWithFileData(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         int fileLength = fileRequestDto.getFileLength();
         String contentType = fileRequestDto.getContentType();
         byte[] fileContent = fileRequestDto.getFileContent();
@@ -42,7 +42,7 @@ public class ResponseWriter {
         this.writeHttpResponse(out, dataOut, contentLength, APPLICATION_JSON, content, HttpStatus.SC_OK);
     }
 
-    public void writeHttpResponse(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+    public void writeHttpResponseWithDirectoryData(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
 
         StringBuilder htmlDirectoryHtmlList = new StringBuilder("<ul>");
 
