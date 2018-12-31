@@ -89,15 +89,16 @@ public class HttpAdapter implements Runnable {
             boolean keepAlive = true;
 
             while (keepAlive){
+                keepAlive = false;
+
                 HttpRequest httpRequest = HttpRequest.parseFrom(in);
                 if(httpRequest != null){
-                    System.out.println("Handling http request");
-                    this.handleHttpMethod(httpResponseHead, httpResponseBody, httpRequest);
-                }
+                    this.processRequest(httpResponseHead, httpResponseBody, httpRequest);
 
+                    keepAlive = httpRequest.keepConnectionAlive();
+                }
             }
 
-            System.out.println("Ending connection I guess");
 
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);
@@ -110,19 +111,22 @@ public class HttpAdapter implements Runnable {
 
     }
 
-    void handleHttpMethod(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, HttpRequest httpRequest) throws IOException {
+    void processRequest(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, HttpRequest httpRequest) throws IOException {
         switch (httpRequest.getMethod()) {
             case POST:
                 try {
                     this.handlePostRequest(httpRequest, httpResponseHead, httpResponseBody);
 
                 }catch (InvalidDataException | WrongContentTypeException e){
+                    log.info("Client sent data, which can not be handled.");
                     this.responseWriter.respondeWith400(httpResponseHead, httpResponseBody);
 
                 }catch (NotFoundException e){
+                    log.info("Provided URI can't be found for POST request.");
                     this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
 
                 }catch (ServiceNotAvaliableException e){
+                    log.info("Service, which handles data is not available right now.");
                     this.responseWriter.respondeWith503(httpResponseHead, httpResponseBody);
 
                 }
@@ -133,6 +137,7 @@ public class HttpAdapter implements Runnable {
                 try{
                     this.handleDirectoryServerRequest(httpRequest, httpResponseHead, httpResponseBody);
                 }catch (DataNotModifiedException | ETagException e){
+                    log.info("Cache is valid. No need to send data");
                     this.responseWriter.respondeWith304(httpResponseHead);
                 }
 
@@ -160,7 +165,7 @@ public class HttpAdapter implements Runnable {
         switch (httpRequest.getUri()) {
             case "/wall_entries":
             case "/wall_entries/":
-                log.info("WallEntry creation");
+                log.info("Handle WallEntry creation");
                 if(!httpRequest.isContentTypeApplicationJson()){
                     throw new WrongContentTypeException();
                 }
@@ -172,7 +177,7 @@ public class HttpAdapter implements Runnable {
 
             case "/wall_entries/query":
             case "/wall_entries/query/":
-                log.info("WallEntry retrievement");
+                log.info("Handle WallEntry retrievement");
 
                 List<WallEntryOutboundDto> wallEntries = this.wallContentService.getAllEntries();
                 this.responseWriter.writeHttpResponse(wallEntries, httpResponseHead, httpResponseBody);

@@ -108,7 +108,7 @@ public class HttpAdapterTest {
         HttpRequest incomingRequest = new HttpRequest("GET", INDEX_HTML, null, null);
         doNothing().when(this.httpAdapter).handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.httpAdapter).handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
     }
@@ -118,7 +118,7 @@ public class HttpAdapterTest {
         HttpRequest incomingRequest = new HttpRequest("POST", WALL_ENTRIES_URI, null, null);
         doNothing().when(this.httpAdapter).handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.httpAdapter).handlePostRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
     }
@@ -126,7 +126,7 @@ public class HttpAdapterTest {
     @Test
     public void expectHandleNotSupportedMethodWith501() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("PUT", WALL_ENTRIES_URI, null, null);
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, incomingRequest);
 
         verify(this.responseWriter).respondeWith501(this.httpResponseHeader, this.httpResponseBody);
     }
@@ -267,7 +267,7 @@ public class HttpAdapterTest {
                 .when(this.httpAdapter)
                 .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
         verify(this.responseWriter).respondeWith400(this.httpResponseHeader, this.httpResponseBody);
     }
@@ -279,7 +279,7 @@ public class HttpAdapterTest {
                 .when(this.httpAdapter)
                 .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
         verify(this.responseWriter).respondeWith400(this.httpResponseHeader, this.httpResponseBody);
     }
@@ -291,7 +291,7 @@ public class HttpAdapterTest {
                 .when(this.httpAdapter)
                 .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
         verify(this.responseWriter).respondeWith404(this.httpResponseHeader, this.httpResponseBody);
     }
@@ -303,7 +303,7 @@ public class HttpAdapterTest {
                 .when(this.httpAdapter)
                 .handlePostRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
         verify(this.responseWriter).respondeWith503(this.httpResponseHeader, this.httpResponseBody);
     }
@@ -337,7 +337,7 @@ public class HttpAdapterTest {
                 .when(this.httpAdapter)
                 .handleDirectoryServerRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
         verify(this.responseWriter).respondeWith304(this.httpResponseHeader);
     }
@@ -349,7 +349,7 @@ public class HttpAdapterTest {
                 .when(this.httpAdapter)
                 .handleDirectoryServerRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+        this.httpAdapter.processRequest(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
 
         verify(this.responseWriter).respondeWith304(this.httpResponseHeader);
     }
