@@ -254,5 +254,26 @@ public class HttpRequestTest {
         assertNull(httpRequest.getCacheHeaders());
     }
 
+    @Test
+    public void expectToReturnTrueForKeepAlive(){
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Connection", "keep-alive");
+        HttpRequest httpRequest = new HttpRequest("GET", "/", headers, "");
+
+        assertTrue(httpRequest.keepConnectionAlive());
+
+    }
+
+    @Test
+    public void expectToReturnFalseForKeepAlive(){
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Connection", "close");
+        HttpRequest httpRequest = new HttpRequest("GET", "/", headers, "");
+
+        assertFalse(httpRequest.keepConnectionAlive());
+    }
+
 
 }
