@@ -2,6 +2,7 @@ package de.blom.httpwebserver.adapter.inbound.http.commons;
 
 import com.google.gson.Gson;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
+import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
@@ -37,6 +38,7 @@ public class ResponseWriterTest {
     private static final String SERVER_INFO = "Server: Java HTTP Server";
     private static final String TEXT_HTML = "text/html";
     private static final int FILE_LENGTH = 123;
+    private static final String DUMMY_ETAG = "akd2l13k12l3";
 
     @Spy
     private ResponseWriter responseWriter;
@@ -78,6 +80,15 @@ public class ResponseWriterTest {
         this.responseWriter.writeResponseHeader(HttpStatus.SC_BAD_REQUEST, out);
 
         verify(this.out).println(eq("HTTP/1.1 400 Bad Request"));
+        verify(this.out).println(eq(SERVER_INFO));
+        verify(this.out).println(eq("Date: " + this.currentDate));
+    }
+
+    @Test
+    public void expectToOutputCorrect304tatus() {
+        this.responseWriter.writeResponseHeader(HttpStatus.SC_NOT_MODIFIED, out);
+
+        verify(this.out).println(eq("HTTP/1.1 304 Not Modified"));
         verify(this.out).println(eq(SERVER_INFO));
         verify(this.out).println(eq("Date: " + this.currentDate));
     }
@@ -143,9 +154,9 @@ public class ResponseWriterTest {
 
         String expectedHTML = "<ul><li>subdirectory/</li><li>index.html</li></ul>";
 
-        this.responseWriter.writeHttpResponse(directoryRequestDto, this.out, this.dataOut);
+        this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, this.out, this.dataOut);
 
-        verify(this.responseWriter).writeHttpResponse(out, dataOut, expectedHTML.getBytes().length, CONTENT_TYPE_HTML, expectedHTML.getBytes(), HttpStatus.SC_OK);
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, expectedHTML.getBytes().length, CONTENT_TYPE_HTML, null, expectedHTML.getBytes(), HttpStatus.SC_OK);
 
     }
 
@@ -195,6 +206,32 @@ public class ResponseWriterTest {
 
         verify(this.responseWriter).writeHttpResponse(out, dataOut, expectedJson.getBytes().length, CONTENT_TYPE_JSON, expectedJson.getBytes(), HttpStatus.SC_OK);
     }
+
+    @Test
+    public void expectToWriteEtagValueForDirectoryRequest() throws IOException {
+        DirectoryRequestDto directoryRequestDto = DirectoryRequestDto.builder()
+                .files(Collections.singletonList("index.html"))
+                .eTag(DUMMY_ETAG)
+                .subdirectories(Collections.singletonList("subdirectory"))
+                .build();
+
+        this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, this.out, this.dataOut);
+
+        verify(this.out).println("ETag: \"" + DUMMY_ETAG + "\"");
+    }
+
+
+    @Test
+    public void expectToWriteEtagValueForFileRequest() throws IOException {
+        FileRequestDto fileRequestDto = FileRequestDto.builder()
+                .eTag(DUMMY_ETAG)
+                .build();
+
+        this.responseWriter.writeHttpResponseWithFileData(fileRequestDto, this.out, this.dataOut);
+
+        verify(this.out).println("ETag: \"" + DUMMY_ETAG + "\"");
+    }
+
 
 
 }
