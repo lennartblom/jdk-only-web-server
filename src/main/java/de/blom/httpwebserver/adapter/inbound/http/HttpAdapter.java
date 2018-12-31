@@ -24,7 +24,6 @@ public class HttpAdapter implements Runnable {
     private static final Logger log = Logger.getLogger(HttpAdapter.class.getName());
 
     private static final int PORT = 8080;
-    private static final boolean VERBOSE = true;
 
     private ResponseWriter responseWriter;
     private Socket connection;
@@ -45,7 +44,7 @@ public class HttpAdapter implements Runnable {
         this.directoryService = new DirectoryService();
     }
 
-    HttpAdapter(Socket c, ResponseWriter responseWriter) {
+    private HttpAdapter(Socket c, ResponseWriter responseWriter) {
         this(c);
         this.responseWriter = responseWriter;
     }
@@ -57,23 +56,19 @@ public class HttpAdapter implements Runnable {
     }
 
     public static void main(String[] args) {
-        try {
-            ServerSocket serverConnect = new ServerSocket(PORT);
+        try (ServerSocket serverConnect = new ServerSocket(PORT)) {
+
             log.info("HTTP Adapter started.\nWaiting for incoming connections on port '" + PORT + "' ...\n");
 
             String directoryParam = null;
-            if(args.length == 1){
+            if (args.length == 1) {
                 directoryParam = args[0];
             }
 
             while (true) {
                 HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept(), directoryParam);
-
-                if (VERBOSE) {
-                    log.info("New connection opened");
-                }
-
                 Thread thread = new Thread(httpAdapter);
+
                 thread.start();
             }
         } catch (IOException e) {
@@ -88,14 +83,17 @@ public class HttpAdapter implements Runnable {
         ) {
             boolean keepAlive = true;
 
-            while (keepAlive){
+            while (keepAlive) {
                 keepAlive = false;
 
                 HttpRequest httpRequest = HttpRequest.parseFrom(in);
-                if(httpRequest != null){
+                if (httpRequest != null) {
                     this.processRequest(httpResponseHead, httpResponseBody, httpRequest);
 
                     keepAlive = httpRequest.keepConnectionAlive();
+                    if (keepAlive) {
+                        log.info("Connection will stay alive");
+                    }
                 }
             }
 
@@ -103,9 +101,8 @@ public class HttpAdapter implements Runnable {
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);
         } finally {
-            if (VERBOSE) {
-                log.info("Connection closed.\n");
-            }
+
+            log.info("Connection closed.\n");
         }
 
 
@@ -117,15 +114,15 @@ public class HttpAdapter implements Runnable {
                 try {
                     this.handlePostRequest(httpRequest, httpResponseHead, httpResponseBody);
 
-                }catch (InvalidDataException | WrongContentTypeException e){
+                } catch (InvalidDataException | WrongContentTypeException e) {
                     log.info("Client sent data, which can not be handled.");
                     this.responseWriter.respondeWith400(httpResponseHead, httpResponseBody);
 
-                }catch (NotFoundException e){
+                } catch (NotFoundException e) {
                     log.info("Provided URI can't be found for POST request.");
                     this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
 
-                }catch (ServiceNotAvaliableException e){
+                } catch (ServiceNotAvaliableException e) {
                     log.info("Service, which handles data is not available right now.");
                     this.responseWriter.respondeWith503(httpResponseHead, httpResponseBody);
 
@@ -134,9 +131,9 @@ public class HttpAdapter implements Runnable {
 
             case HEAD:
             case GET:
-                try{
+                try {
                     this.handleDirectoryServerRequest(httpRequest, httpResponseHead, httpResponseBody);
-                }catch (DataNotModifiedException | ETagException e){
+                } catch (DataNotModifiedException | ETagException e) {
                     log.info("Cache is valid. No need to send data");
                     this.responseWriter.respondeWith304(httpResponseHead);
                 }
@@ -166,7 +163,7 @@ public class HttpAdapter implements Runnable {
             case "/wall_entries":
             case "/wall_entries/":
                 log.info("Handle WallEntry creation");
-                if(!httpRequest.isContentTypeApplicationJson()){
+                if (!httpRequest.isContentTypeApplicationJson()) {
                     throw new WrongContentTypeException();
                 }
                 WallEntryInboundDto dto = WallEntryInboundDto.parseFromRawJson(httpRequest.getRawBody());
@@ -193,17 +190,17 @@ public class HttpAdapter implements Runnable {
         FileRequestDto fileRequestDto = this.directoryService.handleFileRequest(httpRequest.getUri());
 
         if (!fileRequestDto.getFound()) {
-            if(httpRequest.getMethod() == HttpMethod.HEAD){
+            if (httpRequest.getMethod() == HttpMethod.HEAD) {
                 this.responseWriter.respondeWith404(httpResponseHead, null);
-            }else {
+            } else {
                 this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
             }
         } else {
             this.validateCache(httpRequest.getCacheHeaders(), fileRequestDto);
 
-            if(httpRequest.getMethod() == HttpMethod.HEAD){
+            if (httpRequest.getMethod() == HttpMethod.HEAD) {
                 this.responseWriter.writeHttpResponseWithFileData(fileRequestDto, httpResponseHead, null);
-            }else {
+            } else {
                 this.responseWriter.writeHttpResponseWithFileData(fileRequestDto, httpResponseHead, httpResponseBody);
 
             }
@@ -214,25 +211,25 @@ public class HttpAdapter implements Runnable {
         DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(httpRequest.getUri());
 
         if (!directoryRequestDto.getFound()) {
-            if(httpRequest.getMethod() == HttpMethod.HEAD){
+            if (httpRequest.getMethod() == HttpMethod.HEAD) {
                 this.responseWriter.respondeWith404(httpResponseHead, null);
-            }else {
+            } else {
                 this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
             }
 
         } else {
             this.validateCache(httpRequest.getCacheHeaders(), directoryRequestDto);
 
-            if(httpRequest.getMethod() == HttpMethod.HEAD){
+            if (httpRequest.getMethod() == HttpMethod.HEAD) {
                 this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, httpResponseHead, null);
-            }else {
+            } else {
                 this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, httpResponseHead, httpResponseBody);
             }
 
         }
     }
 
-    void validateCache(HttpRequest.CacheHeaders headers, CacheableData cacheableData){
+    void validateCache(HttpRequest.CacheHeaders headers, CacheableData cacheableData) {
         CacheValidator.validateCache(headers, cacheableData);
     }
 
