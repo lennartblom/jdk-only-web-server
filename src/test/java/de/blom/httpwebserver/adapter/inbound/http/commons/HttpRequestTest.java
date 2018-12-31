@@ -1,6 +1,7 @@
 package de.blom.httpwebserver.adapter.inbound.http.commons;
 
 import de.blom.httpwebserver.enums.HttpMethod;
+import org.hamcrest.Matchers;
 import org.hamcrest.beans.SamePropertyValuesAs;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,12 +10,16 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class HttpRequestTest {
@@ -109,7 +114,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void expectToReturnFalsWithNotExistingContentTypeApplicationJson(){
+    public void expectToReturnFalsWithNotExistingContentTypeApplicationJson() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Host", "google.com");
         HttpRequest httpRequest = new HttpRequest("POST", "/", headers, "");
@@ -118,7 +123,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void expectToReturnTrueWithExistingContentTypeApplicationJson(){
+    public void expectToReturnTrueWithExistingContentTypeApplicationJson() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         HttpRequest httpRequest = new HttpRequest("POST", "/", headers, "");
@@ -186,7 +191,6 @@ public class HttpRequestTest {
     }
 
 
-
     @Test
     public void expecToParseHttpRequestWithJqueryContent() throws IOException {
         this.prepareBufferedReader(TEST_JQUERY_AJAX_CALL);
@@ -216,6 +220,38 @@ public class HttpRequestTest {
         HttpMethod enumEntry = HttpRequest.identifyHTTPMethod("Put");
 
         Assert.assertThat(enumEntry, is(HttpMethod.NOT_IMPLEMENTED_YET));
+    }
+
+    @Test
+    public void expectToReturnCacheInformation() throws ParseException {
+        String dateString = "Wed, 21 Oct 2015 07:28:00 GMT";
+        Map<String, String> headers = new HashMap<>();
+        headers.put("If-Modified-Since", dateString);
+        headers.put("If-Match", "33a64df551425fcc55e4d42a148795d9f25f89d4");
+        headers.put("If-None-Match", "33a64df551425fccasdasd55e4d42a148795d9f25f89d4");
+        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+        Date expectedDate = format.parse(dateString);
+
+        HttpRequest.CacheHeaders expectedCacheHeaders = HttpRequest.CacheHeaders.builder()
+                .ifMatch("33a64df551425fcc55e4d42a148795d9f25f89d4")
+                .ifNonMatch("33a64df551425fccasdasd55e4d42a148795d9f25f89d4")
+                .ifModifiedSince(expectedDate)
+                .build();
+
+        HttpRequest httpRequest = new HttpRequest("GET", "/", headers, "");
+
+
+        assertThat(httpRequest.getCacheHeaders(), Matchers.samePropertyValuesAs(expectedCacheHeaders));
+    }
+
+    @Test
+    public void expectToReturnNoCacheInformation() {
+        String dateString = "Wed, 21 Oct 2015 07:28:00 GMT";
+        Map<String, String> headers = new HashMap<>();
+        HttpRequest httpRequest = new HttpRequest("GET", "/", headers, "");
+
+
+        assertNull(httpRequest.getCacheHeaders());
     }
 
 

@@ -2,10 +2,15 @@ package de.blom.httpwebserver.adapter.inbound.http.commons;
 
 import de.blom.httpwebserver.enums.HttpMethod;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -26,9 +31,9 @@ public class HttpRequest {
     public HttpRequest(String method, String uri, Map<String, String> headers, String rawBody) {
         this.method = identifyHTTPMethod(method);
         this.uri = uri;
-        if(headers != null){
+        if (headers != null) {
             this.headers = headers;
-        }else {
+        } else {
             this.headers = new HashMap<>();
         }
         this.rawBody = rawBody;
@@ -45,7 +50,7 @@ public class HttpRequest {
         }
     }
 
-    public boolean isContentTypeApplicationJson(){
+    public boolean isContentTypeApplicationJson() {
         return this.headers.containsKey(CONTENT_TYPE) && APPLICATION_JSON.equals(this.headers.get(CONTENT_TYPE));
     }
 
@@ -53,7 +58,7 @@ public class HttpRequest {
         Map<String, String> headers = new HashMap<>();
 
         String firstLine = in.readLine();
-        if(firstLine == null){
+        if (firstLine == null) {
             return null;
         }
         StringTokenizer firstHttpLine = new StringTokenizer(firstLine);
@@ -75,7 +80,7 @@ public class HttpRequest {
             httpBody = httpBody.concat(nextLine);
             nextLine = in.readLine();
         }
-        if(nextLine != null){
+        if (nextLine != null) {
             httpBody = httpBody.concat(nextLine);
         }
         return httpBody;
@@ -93,29 +98,64 @@ public class HttpRequest {
         return nextLine;
     }
 
-    static Header parseHttpHeaderFromLine(String line){
-        if(line == null){
+    static Header parseHttpHeaderFromLine(String line) {
+        if (line == null) {
             return null;
         }
         StringTokenizer httpHeaderLineTokens = new StringTokenizer(line);
 
-        if(!httpHeaderLineTokens.hasMoreTokens()){
+        if (!httpHeaderLineTokens.hasMoreTokens()) {
             return null;
         }
 
         String headerName = httpHeaderLineTokens.nextToken();
 
-        if(headerName.endsWith(":")){
+        if (headerName.endsWith(":")) {
             headerName = headerName.replace(":", "");
             StringBuilder headerValue = new StringBuilder(httpHeaderLineTokens.nextToken());
-            while(httpHeaderLineTokens.hasMoreTokens()){
+            while (httpHeaderLineTokens.hasMoreTokens()) {
                 headerValue.append(" ").append(httpHeaderLineTokens.nextToken());
             }
             return new Header(headerName, headerValue.toString());
 
-        }else {
+        } else {
             return null;
         }
+    }
+
+    public CacheHeaders getCacheHeaders() {
+        Date ifModifiedSince = null;
+        String ifMatch = null;
+        String ifNoneMatch = null;
+
+        if (this.headers.containsKey(HeaderKeys.IF_MODIFIED_SINCE)){
+            String rawDateValue = this.headers.get(HeaderKeys.IF_MODIFIED_SINCE);
+            SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+            try {
+                ifModifiedSince = format.parse(rawDateValue);
+
+            } catch (ParseException e) {
+                log.info("If-Modified-Since header could not be parsed");
+            }
+        }
+        if (this.headers.containsKey(HeaderKeys.IF_MATCH)){
+            ifMatch = this.headers.get(HeaderKeys.IF_MATCH);
+        }
+        if (this.headers.containsKey(HeaderKeys.IF_NONE_MATCH)){
+            ifNoneMatch = this.headers.get(HeaderKeys.IF_NONE_MATCH);
+        }
+        if(ifModifiedSince == null && ifMatch == null && ifNoneMatch == null){
+            return null;
+        }else {
+            return new CacheHeaders(ifNoneMatch, ifMatch, ifModifiedSince);
+        }
+
+    }
+
+    private static class HeaderKeys {
+        private static final String IF_MODIFIED_SINCE = "If-Modified-Since";
+        private static final String IF_MATCH = "If-Match";
+        private static final String IF_NONE_MATCH = "If-None-Match";
     }
 
 
@@ -124,5 +164,15 @@ public class HttpRequest {
     public static class Header {
         private String name;
         private String value;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class CacheHeaders {
+        private String ifNonMatch;
+        private String ifMatch;
+        private Date ifModifiedSince;
     }
 }
