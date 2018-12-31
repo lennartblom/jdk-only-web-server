@@ -1,6 +1,6 @@
 package de.blom.httpwebserver.adapter.inbound.http.commons;
 
-import de.blom.httpwebserver.exception.DataModifiedException;
+import de.blom.httpwebserver.exception.DataNotModifiedException;
 import de.blom.httpwebserver.exception.ETagException;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import org.junit.Test;
@@ -14,7 +14,7 @@ public class CacheValidatorTest {
     private static final String MOCKED_ETAG_1 = "bfc13a64729c4290ef5b2c2730249c88ca92d82d";
     private static final String MOCKED_ETAG_2 = "0815";
 
-    @Test(expected = DataModifiedException.class)
+    @Test(expected = DataNotModifiedException.class)
     public void expectToThrowDataModifiedException() {
         Date expectedDate = new Date(DATE_TIMESTAMP);
 
@@ -56,6 +56,15 @@ public class CacheValidatorTest {
 
 
         CacheValidator.validateCache(expectedCacheHeaders, data);
+    }
+
+    @Test
+    public void expectToThrowNothingIfNoHeadersExist(){
+        FileRequestDto data = FileRequestDto.builder()
+                .eTag(MOCKED_ETAG_1)
+                .build();
+
+        CacheValidator.validateCache(null, data);
     }
 
 }

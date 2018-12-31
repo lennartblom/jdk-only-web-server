@@ -139,10 +139,10 @@ public class HttpRequest {
             }
         }
         if (this.headers.containsKey(HeaderKeys.IF_MATCH)){
-            ifMatch = this.headers.get(HeaderKeys.IF_MATCH);
+            ifMatch = this.headers.get(HeaderKeys.IF_MATCH).replace("\"", "");
         }
         if (this.headers.containsKey(HeaderKeys.IF_NONE_MATCH)){
-            ifNoneMatch = this.headers.get(HeaderKeys.IF_NONE_MATCH);
+            ifNoneMatch = this.headers.get(HeaderKeys.IF_NONE_MATCH).replace("\"", "");
         }
         if(ifModifiedSince == null && ifMatch == null && ifNoneMatch == null){
             return null;

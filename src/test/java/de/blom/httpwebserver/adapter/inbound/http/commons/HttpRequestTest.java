@@ -227,8 +227,8 @@ public class HttpRequestTest {
         String dateString = "Wed, 21 Oct 2015 07:28:00 GMT";
         Map<String, String> headers = new HashMap<>();
         headers.put("If-Modified-Since", dateString);
-        headers.put("If-Match", "33a64df551425fcc55e4d42a148795d9f25f89d4");
-        headers.put("If-None-Match", "33a64df551425fccasdasd55e4d42a148795d9f25f89d4");
+        headers.put("If-Match", "\"33a64df551425fcc55e4d42a148795d9f25f89d4\"");
+        headers.put("If-None-Match", "\"33a64df551425fccasdasd55e4d42a148795d9f25f89d4\"");
         SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
         Date expectedDate = format.parse(dateString);
 
