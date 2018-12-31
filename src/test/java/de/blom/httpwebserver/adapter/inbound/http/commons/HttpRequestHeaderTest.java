@@ -4,7 +4,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
 
 public class HttpRequestHeaderTest {
     private static final String TEST_CONTENT_TYPE_HEADER = "Content-Type: application/json";

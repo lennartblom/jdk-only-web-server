@@ -7,22 +7,22 @@ import lombok.Getter;
 import java.util.Date;
 
 @Getter
-public class WallEntry {
+class WallEntry {
     private Date created;
     private String author;
     private String text;
 
-    public WallEntry(WallEntryInboundDto dto){
+    WallEntry(WallEntryInboundDto dto){
         this(dto.getAuthor(), dto.getText());
     }
 
-    public WallEntry(String author, String text){
+    WallEntry(String author, String text){
         this.author = author;
         this.text = text;
         this.created = new Date();
     }
 
-    public final BasicDBObject toMongoDbObject() {
+    final BasicDBObject toMongoDbObject() {
         return new BasicDBObject("author", this.author)
                 .append("text", this.text)
                 .append("created", this.created);

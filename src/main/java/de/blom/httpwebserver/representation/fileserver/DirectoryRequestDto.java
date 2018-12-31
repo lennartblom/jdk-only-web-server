@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
@@ -37,11 +40,11 @@ public class DirectoryRequestDto extends CacheableData {
         List fileList = dto.files;
         List directoryList = dto.subdirectories;
         if(fileList == null){
-            fileList = Collections.EMPTY_LIST;
+            fileList = Collections.emptyList();
         }
 
         if(directoryList == null){
-            directoryList = Collections.EMPTY_LIST;
+            directoryList = Collections.emptyList();
         }
 
         return DigestUtils.md5Hex(fileList.toString() + directoryList.toString());

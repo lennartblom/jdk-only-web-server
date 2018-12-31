@@ -58,13 +58,12 @@ public class DirectoryService {
             dto.setETag(DirectoryRequestDto.generateETag(dto));
             return dto;
         } else {
-            File[] containedFiles = directoryElements;
-
+            
             List<String> files = new ArrayList<>();
             List<String> subdirectories = new ArrayList<>();
 
 
-            for (File file : containedFiles) {
+            for (File file : directoryElements) {
                 if (file.listFiles() != null) {
                     subdirectories.add(file.getName());
                 } else {

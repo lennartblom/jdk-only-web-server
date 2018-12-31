@@ -14,5 +14,4 @@ public class WallEntryOutboundDto {
     private String text;
     private Date created;
 
-
 }

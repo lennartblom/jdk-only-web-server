@@ -2,12 +2,12 @@ package de.blom.httpwebserver.adapter.inbound.http;
 
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
+import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.domain.wall.WallContentService;
 import de.blom.httpwebserver.enums.HttpMethod;
 import de.blom.httpwebserver.exception.*;
 import de.blom.httpwebserver.representation.fileserver.CacheableData;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
-import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
 import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
@@ -30,10 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)

@@ -154,7 +154,7 @@ public class HttpRequest {
 
     public boolean keepConnectionAlive() {
         if (this.headers.containsKey(HeaderKeys.CONNECTION)) {
-            if(HeaderValues.CONNECTION_close.equals(this.headers.get(HeaderKeys.CONNECTION))){
+            if(HeaderValues.CONNECTION_CLOSE.equals(this.headers.get(HeaderKeys.CONNECTION))){
                 return false;
             }else return HeaderValues.CONNECTION_KEEP_ALIVE.equals(this.headers.get(HeaderKeys.CONNECTION));
         } else {
@@ -173,7 +173,7 @@ public class HttpRequest {
     private static class HeaderValues {
         private static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
         private static final String CONNECTION_KEEP_ALIVE = "keep-alive";
-        private static final String CONNECTION_close = "close";
+        private static final String CONNECTION_CLOSE = "close";
     }
 
 

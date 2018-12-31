@@ -18,9 +18,7 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class HttpRequestTest {
 
@@ -108,6 +106,7 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
+        assertNotNull(httpRequest);
         assertThat(httpRequest.getMethod(), is(HttpMethod.GET));
         assertThat(httpRequest.getUri(), is("/pub/WWW/TheProject.html"));
         assertThat(httpRequest.getHeaders(), SamePropertyValuesAs.samePropertyValuesAs(expectedHeaders));
@@ -142,6 +141,7 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
+        assertNotNull(httpRequest);
         assertThat(httpRequest.getMethod(), is(HttpMethod.POST));
         assertThat(httpRequest.getUri(), is("/testRoute"));
         assertThat(httpRequest.getHeaders(), SamePropertyValuesAs.samePropertyValuesAs(expectedHeaders));
@@ -159,6 +159,7 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
+        assertNotNull(httpRequest);
         assertThat(httpRequest.getMethod(), is(HttpMethod.POST));
         assertThat(httpRequest.getUri(), is("/testRoute"));
         assertThat(httpRequest.getHeaders(), SamePropertyValuesAs.samePropertyValuesAs(expectedHeaders));
@@ -171,6 +172,7 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
+        assertNotNull(httpRequest);
         assertThat(httpRequest.getMethod(), is(HttpMethod.POST));
         assertThat(httpRequest.getUri(), is("/testRoute"));
         assertThat(httpRequest.getRawBody(), is("{  \"name\": \"1531923956.517\",  \"login\": \"asd\",  \"password\": \"testpassword\"}"));
@@ -180,13 +182,9 @@ public class HttpRequestTest {
     public void expectToSetHeadersFromChromGetRequest() throws IOException {
 
         this.prepareBufferedReader(TEST_CHROME_REQUEST);
-        Map<String, String> expectedHeaders = new HashMap<>();
-        expectedHeaders.put("Content-Type", "application/json");
-        expectedHeaders.put("Host", "localhost");
-        expectedHeaders.put("cache-control", "no-cache");
-        expectedHeaders.put("Postman-Token", "96621bec-a11a-4c9c-a7ff-6a87c9369e02");
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
+        assertNotNull(httpRequest);
         assertThat(httpRequest.getMethod(), is(HttpMethod.GET));
     }
 
@@ -197,7 +195,7 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = HttpRequest.parseFrom(this.bufferedReader);
 
-
+        assertNotNull(httpRequest);
         assertThat(httpRequest.getMethod(), is(HttpMethod.POST));
     }
 

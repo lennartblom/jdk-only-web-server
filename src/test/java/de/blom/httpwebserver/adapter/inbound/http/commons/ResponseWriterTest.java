@@ -21,9 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResponseWriterTest {
@@ -164,21 +162,21 @@ public class ResponseWriterTest {
     public void expectToWriterProper503Response() throws IOException {
         this.responseWriter.respondeWith503(out, dataOut);
 
-        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.SERVICE_NOT_AVAILABLE.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.ResponseHtmlData.SERVICE_NOT_AVAILABLE.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.ResponseHtmlData.SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
     }
 
     @Test
     public void expectToWriterProper400Response() throws IOException {
         this.responseWriter.respondeWith400(this.out, this.dataOut);
 
-        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.BAD_REQUEST.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.ResponseHtmlData.BAD_REQUEST.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.ResponseHtmlData.BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void expectToWriterProper204Response() throws IOException {
         this.responseWriter.respondeWith201(this.out, this.dataOut);
 
-        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.WALL_ENTRY_CREATED.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
+        verify(this.responseWriter).writeHttpResponse(out, dataOut, ResponseWriter.ResponseHtmlData.WALL_ENTRY_CREATED.getBytes().length, CONTENT_TYPE_HTML, ResponseWriter.ResponseHtmlData.WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
     }
 
     @Test

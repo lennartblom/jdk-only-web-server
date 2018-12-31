@@ -14,26 +14,12 @@ import java.util.List;
 
 public class ResponseWriter {
 
-
-    private static final String FILE_NOT_FOUND_HTML = "<h1>404 not Found</h1>";
-    static final String BAD_REQUEST = "<h1>400 Bad Request</h1>";
-    private static final String METHOD_NOT_IMPLEMENTED_HTML = "<h1>501 method not implemented</h1>";
-    static final String SERVICE_NOT_AVAILABLE = "<h1>503 Service not available</h1>";
-    static final String WALL_ENTRY_CREATED = "<h1>Wall entry created</h1>";
-
-    private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li>%s/</li>";
-    private static final String FILE_LIST_ENTRY_TEMPLATE = "<li>%s</li>";
-
-    private static final String TEXT_HTML = "text/html";
-    private static final String APPLICATION_JSON = "application/json";
-
-
     public void writeHttpResponse(List<WallEntryOutboundDto> wallEntries, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         String json = new Gson().toJson(wallEntries);
         int contentLength = json.getBytes().length;
         byte[] content = json.getBytes();
 
-        this.writeHttpResponse(out, dataOut, contentLength, APPLICATION_JSON, content, HttpStatus.SC_OK);
+        this.writeHttpResponse(out, dataOut, contentLength, ContentTypes.APPLICATION_JSON, content, HttpStatus.SC_OK);
     }
 
 
@@ -48,8 +34,8 @@ public class ResponseWriter {
 
         StringBuilder htmlDirectoryHtmlList = new StringBuilder("<ul>");
 
-        this.createListEntriesForDirectoryElements(htmlDirectoryHtmlList, directoryRequestDto.getSubdirectories(), DIRECTORY_LIST_ENTRY_TEMPLATE);
-        this.createListEntriesForDirectoryElements(htmlDirectoryHtmlList, directoryRequestDto.getFiles(), FILE_LIST_ENTRY_TEMPLATE);
+        this.createListEntriesForDirectoryElements(htmlDirectoryHtmlList, directoryRequestDto.getSubdirectories(), HtmlTemplateData.DIRECTORY_LIST_ENTRY_TEMPLATE);
+        this.createListEntriesForDirectoryElements(htmlDirectoryHtmlList, directoryRequestDto.getFiles(), HtmlTemplateData.FILE_LIST_ENTRY_TEMPLATE);
 
         htmlDirectoryHtmlList.append("</ul>");
 
@@ -58,7 +44,7 @@ public class ResponseWriter {
                 out,
                 dataOut,
                 htmlDirectoryHtmlList.toString().getBytes().length,
-                TEXT_HTML,
+                ContentTypes.TEXT_HTML,
                 directoryRequestDto.getETag(),
                 htmlDirectoryHtmlList.toString().getBytes(),
                 HttpStatus.SC_OK
@@ -141,23 +127,23 @@ public class ResponseWriter {
     }
 
     public void respondeWith404(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(httpResponseHead, dataOut, FILE_NOT_FOUND_HTML.getBytes().length, TEXT_HTML, FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
+        this.writeHttpResponse(httpResponseHead, dataOut, ResponseHtmlData.FILE_NOT_FOUND_HTML.getBytes().length, ContentTypes.TEXT_HTML, ResponseHtmlData.FILE_NOT_FOUND_HTML.getBytes(), HttpStatus.SC_NOT_FOUND);
     }
 
     public void respondeWith400(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
-        this.writeHttpResponse(httpResponseHead, httpResponseBody, BAD_REQUEST.getBytes().length, TEXT_HTML, BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
+        this.writeHttpResponse(httpResponseHead, httpResponseBody, ResponseHtmlData.BAD_REQUEST.getBytes().length, ContentTypes.TEXT_HTML, ResponseHtmlData.BAD_REQUEST.getBytes(), HttpStatus.SC_BAD_REQUEST);
     }
 
     public void respondeWith503(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
-        this.writeHttpResponse(httpResponseHead, httpResponseBody, SERVICE_NOT_AVAILABLE.getBytes().length, TEXT_HTML, SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
+        this.writeHttpResponse(httpResponseHead, httpResponseBody, ResponseHtmlData.SERVICE_NOT_AVAILABLE.getBytes().length, ContentTypes.TEXT_HTML, ResponseHtmlData.SERVICE_NOT_AVAILABLE.getBytes(), HttpStatus.SC_SERVICE_UNAVAILABLE);
     }
 
     public void respondeWith501(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(httpResponseHead, dataOut, METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, TEXT_HTML, METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
+        this.writeHttpResponse(httpResponseHead, dataOut, ResponseHtmlData.METHOD_NOT_IMPLEMENTED_HTML.getBytes().length, ContentTypes.TEXT_HTML, ResponseHtmlData.METHOD_NOT_IMPLEMENTED_HTML.getBytes(), HttpStatus.SC_NOT_IMPLEMENTED);
     }
 
     public void respondeWith201(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
-        this.writeHttpResponse(httpResponseHead, dataOut, WALL_ENTRY_CREATED.getBytes().length, TEXT_HTML, WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
+        this.writeHttpResponse(httpResponseHead, dataOut, ResponseHtmlData.WALL_ENTRY_CREATED.getBytes().length, ContentTypes.TEXT_HTML, ResponseHtmlData.WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
     }
 
     public void respondeWith304(PrintWriter httpResponseHead) {
@@ -175,5 +161,33 @@ public class ResponseWriter {
         return new Date();
     }
 
+    private static class HtmlTemplateData{
+        private HtmlTemplateData() {
+        }
+
+        private static final String DIRECTORY_LIST_ENTRY_TEMPLATE = "<li>%s/</li>";
+        private static final String FILE_LIST_ENTRY_TEMPLATE = "<li>%s</li>";
+    }
+
+    static class ResponseHtmlData {
+        private ResponseHtmlData(){
+        }
+
+        static final String SERVICE_NOT_AVAILABLE = "<h1>503 Service not available</h1>";
+        private static final String FILE_NOT_FOUND_HTML = "<h1>404 not Found</h1>";
+        static final String BAD_REQUEST = "<h1>400 Bad Request</h1>";
+        private static final String METHOD_NOT_IMPLEMENTED_HTML = "<h1>501 method not implemented</h1>";
+        static final String WALL_ENTRY_CREATED = "<h1>Wall entry created</h1>";
+
+    }
+
+    private static class ContentTypes{
+        private ContentTypes(){
+        }
+
+        private static final String TEXT_HTML = "text/html";
+        private static final String APPLICATION_JSON = "application/json";
+
+    }
 
 }
