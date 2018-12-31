@@ -1,14 +1,13 @@
 package de.blom.httpwebserver.adapter.inbound.http;
 
+import de.blom.httpwebserver.adapter.inbound.http.commons.CacheValidator;
 import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.domain.wall.WallContentService;
 import de.blom.httpwebserver.enums.HttpMethod;
-import de.blom.httpwebserver.exception.InvalidDataException;
-import de.blom.httpwebserver.exception.NotFoundException;
-import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
-import de.blom.httpwebserver.exception.WrongContentTypeException;
+import de.blom.httpwebserver.exception.*;
+import de.blom.httpwebserver.representation.fileserver.CacheableData;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import de.blom.httpwebserver.representation.wall.WallEntryInboundDto;
@@ -61,7 +60,7 @@ public class HttpAdapter implements Runnable {
     public static void main(String[] args) {
         try {
             ServerSocket serverConnect = new ServerSocket(PORT);
-            log.info("Server started.\nListening for connections on port : " + PORT + " ...\n");
+            log.info("HTTP Adapter started.\nWaiting for incoming connections on port '" + PORT + "' ...\n");
 
             String directoryParam = null;
             if(args.length == 1){
@@ -72,15 +71,14 @@ public class HttpAdapter implements Runnable {
                 HttpAdapter httpAdapter = new HttpAdapter(serverConnect.accept(), directoryParam);
 
                 if (VERBOSE) {
-                    log.info("Connection opened. (" + new Date() + ")");
+                    log.info("New connection opened");
                 }
 
-                // create dedicated thread to manage the client connection
                 Thread thread = new Thread(httpAdapter);
                 thread.start();
             }
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Server Connection error : " + e.getMessage(), e);
+            log.log(Level.SEVERE, "A Server Connection error occured: " + e.getMessage(), e);
         }
     }
 
@@ -128,7 +126,12 @@ public class HttpAdapter implements Runnable {
 
             case HEAD:
             case GET:
-                this.handleDirectoryServerRequest(httpRequest, httpResponseHead, httpResponseBody);
+                try{
+                    this.handleDirectoryServerRequest(httpRequest, httpResponseHead, httpResponseBody);
+                }catch (DataNotModifiedException | ETagException e){
+                    this.responseWriter.respondeWith304(httpResponseHead);
+                }
+
                 break;
 
             default:
@@ -180,7 +183,6 @@ public class HttpAdapter implements Runnable {
     void handleFileRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
         FileRequestDto fileRequestDto = this.directoryService.handleFileRequest(httpRequest.getUri());
 
-        // Todo test needed... and remove duplicate code
         if (!fileRequestDto.getFound()) {
             if(httpRequest.getMethod() == HttpMethod.HEAD){
                 this.responseWriter.respondeWith404(httpResponseHead, null);
@@ -188,10 +190,12 @@ public class HttpAdapter implements Runnable {
                 this.responseWriter.respondeWith404(httpResponseHead, httpResponseBody);
             }
         } else {
+            this.validateCache(httpRequest.getCacheHeaders(), fileRequestDto);
+
             if(httpRequest.getMethod() == HttpMethod.HEAD){
-                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, null);
+                this.responseWriter.writeHttpResponseWithFileData(fileRequestDto, httpResponseHead, null);
             }else {
-                this.responseWriter.writeHttpResponse(fileRequestDto, httpResponseHead, httpResponseBody);
+                this.responseWriter.writeHttpResponseWithFileData(fileRequestDto, httpResponseHead, httpResponseBody);
 
             }
         }
@@ -199,6 +203,7 @@ public class HttpAdapter implements Runnable {
 
     void handleDirectoryRequest(HttpRequest httpRequest, PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody) throws IOException {
         DirectoryRequestDto directoryRequestDto = this.directoryService.handleDirectoryRequest(httpRequest.getUri());
+
         if (!directoryRequestDto.getFound()) {
             if(httpRequest.getMethod() == HttpMethod.HEAD){
                 this.responseWriter.respondeWith404(httpResponseHead, null);
@@ -207,14 +212,19 @@ public class HttpAdapter implements Runnable {
             }
 
         } else {
+            this.validateCache(httpRequest.getCacheHeaders(), directoryRequestDto);
+
             if(httpRequest.getMethod() == HttpMethod.HEAD){
-                this.responseWriter.writeHttpResponse(directoryRequestDto, httpResponseHead, null);
+                this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, httpResponseHead, null);
             }else {
-                this.responseWriter.writeHttpResponse(directoryRequestDto, httpResponseHead, httpResponseBody);
+                this.responseWriter.writeHttpResponseWithDirectoryData(directoryRequestDto, httpResponseHead, httpResponseBody);
             }
 
         }
     }
 
+    void validateCache(HttpRequest.CacheHeaders headers, CacheableData cacheableData){
+        CacheValidator.validateCache(headers, cacheableData);
+    }
 
 }

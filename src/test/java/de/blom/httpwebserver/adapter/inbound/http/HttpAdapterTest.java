@@ -4,10 +4,8 @@ import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
 import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
 import de.blom.httpwebserver.domain.wall.WallContentService;
 import de.blom.httpwebserver.enums.HttpMethod;
-import de.blom.httpwebserver.exception.NotFoundException;
-import de.blom.httpwebserver.exception.ServiceNotAvaliableException;
-import de.blom.httpwebserver.exception.WrongContentTypeException;
-import de.blom.httpwebserver.exception.InvalidDataException;
+import de.blom.httpwebserver.exception.*;
+import de.blom.httpwebserver.representation.fileserver.CacheableData;
 import de.blom.httpwebserver.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpwebserver.domain.fileserver.DirectoryService;
 import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
@@ -86,6 +84,9 @@ public class HttpAdapterTest {
     @Mock
     private HttpRequest httpRequest;
 
+    @Mock
+    private HttpRequest.CacheHeaders cacheHeaders;
+
     @Before
     public void setup() {
 
@@ -134,6 +135,9 @@ public class HttpAdapterTest {
     public void expectToCallDirectoryHandling() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("GET", ROOT_DIRECTORY, null, null);
         when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY)).thenReturn(this.mockedDirectoryRequestDtoFound);
+        doNothing()
+                .when(this.httpAdapter)
+                .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
         this.httpAdapter.handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
@@ -144,6 +148,9 @@ public class HttpAdapterTest {
     public void expectToCallFileHandling() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("GET", INDEX_HTML, null, null);
         when(this.directoryService.handleFileRequest(INDEX_HTML)).thenReturn(mockedFileRequestDtoFound);
+        doNothing()
+                .when(this.httpAdapter)
+                .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
         this.httpAdapter.handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
@@ -154,6 +161,9 @@ public class HttpAdapterTest {
     public void expectToCallFileHandlingNotFoundWithoutHttpResponseBody() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("HEAD", INDEX_HTML, null, null);
         when(this.directoryService.handleFileRequest(INDEX_HTML)).thenReturn(this.mockedFileRequestDtoNotFound);
+        doNothing()
+                .when(this.httpAdapter)
+                .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
         this.httpAdapter.handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
@@ -165,16 +175,23 @@ public class HttpAdapterTest {
     public void expectToCallFileHandlingWithoutHttpResponseBody() throws IOException {
         when(this.directoryService.handleFileRequest(INDEX_HTML)).thenReturn(this.mockedFileRequestDtoFound);
         HttpRequest incomingRequest = new HttpRequest("HEAD", INDEX_HTML, null, null);
+        doNothing()
+                .when(this.httpAdapter)
+                .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
         this.httpAdapter.handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        verify(this.responseWriter).writeHttpResponse(this.mockedFileRequestDtoFound, this.httpResponseHeader, null);
+        verify(this.responseWriter).writeHttpResponseWithFileData(this.mockedFileRequestDtoFound, this.httpResponseHeader, null);
     }
 
     @Test
     public void expectToCallDirectoryHandling404WithoutHttpResponseBody() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("HEAD", ROOT_DIRECTORY, null, null);
         when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY)).thenReturn(this.mockedDirectoryRequestDtoNotFound);
+
+        doNothing()
+                .when(this.httpAdapter)
+                .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
         this.httpAdapter.handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
@@ -185,10 +202,13 @@ public class HttpAdapterTest {
     public void expectToCallDirectoryHandlingWithoutHttpResponseBody() throws IOException {
         HttpRequest incomingRequest = new HttpRequest("HEAD", ROOT_DIRECTORY, null, null);
         when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY)).thenReturn(this.mockedDirectoryRequestDtoFound);
+        doNothing()
+                .when(this.httpAdapter)
+                .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
         this.httpAdapter.handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
-        verify(this.responseWriter).writeHttpResponse(this.mockedDirectoryRequestDtoFound, this.httpResponseHeader, null);
+        verify(this.responseWriter).writeHttpResponseWithDirectoryData(this.mockedDirectoryRequestDtoFound, this.httpResponseHeader, null);
     }
 
     @Test
@@ -309,5 +329,29 @@ public class HttpAdapterTest {
         verify(this.wallContentService).getAllEntries();
     }
 
+
+    @Test
+    public void expectToRespondeWith304_dataModified() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.GET);
+        doThrow(new DataNotModifiedException())
+                .when(this.httpAdapter)
+                .handleDirectoryServerRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith304(this.httpResponseHeader);
+    }
+
+    @Test
+    public void expectToRespondeWith304_ETag() throws IOException {
+        when(this.httpRequest.getMethod()).thenReturn(HttpMethod.GET);
+        doThrow(new ETagException())
+                .when(this.httpAdapter)
+                .handleDirectoryServerRequest(this.httpRequest, this.httpResponseHeader, this.httpResponseBody);
+
+        this.httpAdapter.handleHttpMethod(this.httpResponseHeader, this.httpResponseBody, this.httpRequest);
+
+        verify(this.responseWriter).respondeWith304(this.httpResponseHeader);
+    }
 
 }

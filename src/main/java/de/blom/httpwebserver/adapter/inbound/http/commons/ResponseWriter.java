@@ -27,12 +27,6 @@ public class ResponseWriter {
     private static final String TEXT_HTML = "text/html";
     private static final String APPLICATION_JSON = "application/json";
 
-    public void writeHttpResponse(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
-        int fileLength = fileRequestDto.getFileLength();
-        String contentType = fileRequestDto.getContentType();
-        byte[] fileContent = fileRequestDto.getFileContent();
-        this.writeHttpResponse(out, dataOut, fileLength, contentType, fileContent, HttpStatus.SC_OK);
-    }
 
     public void writeHttpResponse(List<WallEntryOutboundDto> wallEntries, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
         String json = new Gson().toJson(wallEntries);
@@ -42,7 +36,15 @@ public class ResponseWriter {
         this.writeHttpResponse(out, dataOut, contentLength, APPLICATION_JSON, content, HttpStatus.SC_OK);
     }
 
-    public void writeHttpResponse(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+
+    public void writeHttpResponseWithFileData(FileRequestDto fileRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
+        int fileLength = fileRequestDto.getFileLength();
+        String contentType = fileRequestDto.getContentType();
+        byte[] fileContent = fileRequestDto.getFileContent();
+        this.writeHttpResponse(out, dataOut, fileLength, contentType, fileRequestDto.getETag(), fileContent, HttpStatus.SC_OK);
+    }
+
+    public void writeHttpResponseWithDirectoryData(DirectoryRequestDto directoryRequestDto, PrintWriter out, BufferedOutputStream dataOut) throws IOException {
 
         StringBuilder htmlDirectoryHtmlList = new StringBuilder("<ul>");
 
@@ -51,7 +53,16 @@ public class ResponseWriter {
 
         htmlDirectoryHtmlList.append("</ul>");
 
-        this.writeHttpResponse(out, dataOut, htmlDirectoryHtmlList.toString().getBytes().length, TEXT_HTML, htmlDirectoryHtmlList.toString().getBytes(), HttpStatus.SC_OK);
+
+        this.writeHttpResponse(
+                out,
+                dataOut,
+                htmlDirectoryHtmlList.toString().getBytes().length,
+                TEXT_HTML,
+                directoryRequestDto.getETag(),
+                htmlDirectoryHtmlList.toString().getBytes(),
+                HttpStatus.SC_OK
+        );
 
     }
 
@@ -62,15 +73,29 @@ public class ResponseWriter {
         }
     }
 
-    void writeHttpResponse(PrintWriter httpResponseHead, BufferedOutputStream httpResponseBody, int contentLength, String contentMimeType, byte[] fileData, int statusCode) throws IOException {
-        this.writeResponseHeader(statusCode, httpResponseHead);
-        this.writeResponseContentInformation(contentMimeType, contentLength, httpResponseHead);
-        httpResponseHead.println();
-        httpResponseHead.flush();
+    void writeHttpResponse(PrintWriter head, BufferedOutputStream body, int contentLength, String contentType, byte[] data, int statusCode) throws IOException {
+        this.writeResponseHeader(statusCode, head);
+        this.writeResponseContentInformation(contentType, contentLength, head);
+        head.println();
+        head.flush();
 
-        if (httpResponseBody != null) {
-            httpResponseBody.write(fileData, 0, contentLength);
-            httpResponseBody.flush();
+        if (body != null) {
+            body.write(data, 0, contentLength);
+            body.flush();
+        }
+
+    }
+
+    void writeHttpResponse(PrintWriter head, BufferedOutputStream body, int contentLength, String contentType, String eTag, byte[] data, int statusCode) throws IOException {
+        this.writeResponseHeader(statusCode, head);
+        head.println("ETag: \"" + eTag + "\"");
+        this.writeResponseContentInformation(contentType, contentLength, head);
+        head.println();
+        head.flush();
+
+        if (body != null) {
+            body.write(data, 0, contentLength);
+            body.flush();
         }
 
     }
@@ -83,6 +108,10 @@ public class ResponseWriter {
 
             case HttpStatus.SC_OK:
                 httpResponseHead.println("HTTP/1.1 200 OK");
+                break;
+
+            case HttpStatus.SC_NOT_MODIFIED:
+                httpResponseHead.println("HTTP/1.1 304 Not Modified");
                 break;
 
             case HttpStatus.SC_NOT_IMPLEMENTED:
@@ -129,6 +158,12 @@ public class ResponseWriter {
 
     public void respondeWith201(PrintWriter httpResponseHead, BufferedOutputStream dataOut) throws IOException {
         this.writeHttpResponse(httpResponseHead, dataOut, WALL_ENTRY_CREATED.getBytes().length, TEXT_HTML, WALL_ENTRY_CREATED.getBytes(), HttpStatus.SC_CREATED);
+    }
+
+    public void respondeWith304(PrintWriter httpResponseHead) {
+        this.writeResponseHeader(HttpStatus.SC_NOT_MODIFIED, httpResponseHead);
+        httpResponseHead.println();
+        httpResponseHead.flush();
     }
 
     private void writeServerAndDateInformation(PrintWriter httpResponseHead) {

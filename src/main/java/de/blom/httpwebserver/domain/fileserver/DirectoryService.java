@@ -7,6 +7,7 @@ import de.blom.httpwebserver.representation.fileserver.FileRequestDto;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,13 +42,21 @@ public class DirectoryService {
 
     public DirectoryRequestDto handleDirectoryRequest(String directoryPath) {
         File directory = this.filesystem.retrieveFile(directoryPath);
+
         if (directory == null) {
             return new DirectoryRequestDto();
         }
+        Date lastModified = new Date(directory.lastModified());
         File[] directoryElements = directory.listFiles();
 
         if (directoryElements == null) {
-            return new DirectoryRequestDto();
+            DirectoryRequestDto dto = DirectoryRequestDto.builder()
+                    .lastModified(lastModified)
+                    .found(true)
+                    .build();
+
+            dto.setETag(DirectoryRequestDto.generateETag(dto));
+            return dto;
         } else {
             File[] containedFiles = directoryElements;
 
@@ -62,11 +71,15 @@ public class DirectoryService {
                     files.add(file.getName());
                 }
             }
-            return DirectoryRequestDto.builder()
+            DirectoryRequestDto dto = DirectoryRequestDto.builder()
                     .found(true)
                     .files(files)
                     .subdirectories(subdirectories)
+                    .lastModified(lastModified)
                     .build();
+            dto.setETag(DirectoryRequestDto.generateETag(dto));
+
+            return dto;
         }
     }
 
@@ -75,15 +88,20 @@ public class DirectoryService {
         if (file != null) {
             String contentType = this.getContentType(retrieveFile);
             int fileLength = (int) file.length();
+            Date lastModified = new Date(file.lastModified());
 
             try {
                 byte[] fileContent = this.filesystem.readFileData(file, fileLength);
-                return FileRequestDto.builder()
+                FileRequestDto dto = FileRequestDto.builder()
                         .found(true)
                         .contentType(contentType)
                         .fileLength(fileLength)
                         .fileContent(fileContent)
+                        .lastModified(lastModified)
                         .build();
+
+                dto.setETag(FileRequestDto.generateETag(dto));
+                return dto;
 
             } catch (IOException ioexception) {
                 log.log(Level.SEVERE, "Error while retrieving file content", ioexception);
