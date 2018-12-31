@@ -20,8 +20,6 @@ import java.util.logging.Logger;
 @Getter
 public class HttpRequest {
     private static final Logger log = Logger.getLogger(HttpRequest.class.getName());
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String APPLICATION_JSON = "application/json";
 
     private HttpMethod method;
     private String uri;
@@ -51,7 +49,9 @@ public class HttpRequest {
     }
 
     public boolean isContentTypeApplicationJson() {
-        return this.headers.containsKey(CONTENT_TYPE) && APPLICATION_JSON.equals(this.headers.get(CONTENT_TYPE));
+        return this.headers.containsKey(HeaderKeys.CONTENT_TYPE) &&
+                HeaderValues.CONTENT_TYPE_APPLICATION_JSON
+                        .equals(this.headers.get(HeaderKeys.CONTENT_TYPE));
     }
 
     public static HttpRequest parseFrom(BufferedReader in) throws IOException {
@@ -128,7 +128,7 @@ public class HttpRequest {
         String ifMatch = null;
         String ifNoneMatch = null;
 
-        if (this.headers.containsKey(HeaderKeys.IF_MODIFIED_SINCE)){
+        if (this.headers.containsKey(HeaderKeys.IF_MODIFIED_SINCE)) {
             String rawDateValue = this.headers.get(HeaderKeys.IF_MODIFIED_SINCE);
             SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
             try {
@@ -138,24 +138,42 @@ public class HttpRequest {
                 log.info("If-Modified-Since header could not be parsed");
             }
         }
-        if (this.headers.containsKey(HeaderKeys.IF_MATCH)){
+        if (this.headers.containsKey(HeaderKeys.IF_MATCH)) {
             ifMatch = this.headers.get(HeaderKeys.IF_MATCH).replace("\"", "");
         }
-        if (this.headers.containsKey(HeaderKeys.IF_NONE_MATCH)){
+        if (this.headers.containsKey(HeaderKeys.IF_NONE_MATCH)) {
             ifNoneMatch = this.headers.get(HeaderKeys.IF_NONE_MATCH).replace("\"", "");
         }
-        if(ifModifiedSince == null && ifMatch == null && ifNoneMatch == null){
+        if (ifModifiedSince == null && ifMatch == null && ifNoneMatch == null) {
             return null;
-        }else {
+        } else {
             return new CacheHeaders(ifNoneMatch, ifMatch, ifModifiedSince);
         }
 
+    }
+
+    public boolean keepConnectionAlive() {
+        if (this.headers.containsKey(HeaderKeys.CONNECTION)) {
+            if(HeaderValues.CONNECTION_close.equals(this.headers.get(HeaderKeys.CONNECTION))){
+                return false;
+            }else return HeaderValues.CONNECTION_KEEP_ALIVE.equals(this.headers.get(HeaderKeys.CONNECTION));
+        } else {
+            return false;
+        }
     }
 
     private static class HeaderKeys {
         private static final String IF_MODIFIED_SINCE = "If-Modified-Since";
         private static final String IF_MATCH = "If-Match";
         private static final String IF_NONE_MATCH = "If-None-Match";
+        private static final String CONNECTION = "Connection";
+        private static final String CONTENT_TYPE = "Content-Type";
+    }
+
+    private static class HeaderValues {
+        private static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
+        private static final String CONNECTION_KEEP_ALIVE = "keep-alive";
+        private static final String CONNECTION_close = "close";
     }
 
 

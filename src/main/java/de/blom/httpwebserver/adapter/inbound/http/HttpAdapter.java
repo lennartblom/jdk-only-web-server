@@ -16,7 +16,6 @@ import de.blom.httpwebserver.representation.wall.WallEntryOutboundDto;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +27,7 @@ public class HttpAdapter implements Runnable {
     private static final boolean VERBOSE = true;
 
     private ResponseWriter responseWriter;
-    private Socket connect;
+    private Socket connection;
     private DirectoryService directoryService;
     private WallContentService wallContentService;
 
@@ -36,13 +35,13 @@ public class HttpAdapter implements Runnable {
     private HttpAdapter(Socket c, String directoryParam) {
         this.wallContentService = new WallContentService();
         this.responseWriter = new ResponseWriter();
-        this.connect = c;
+        this.connection = c;
         this.directoryService = new DirectoryService(directoryParam);
     }
 
     private HttpAdapter(Socket c) {
         this.responseWriter = new ResponseWriter();
-        this.connect = c;
+        this.connection = c;
         this.directoryService = new DirectoryService();
     }
 
@@ -83,17 +82,22 @@ public class HttpAdapter implements Runnable {
     }
 
     public void run() {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(this.connect.getInputStream()));
-             PrintWriter httpResponseHead = new PrintWriter(this.connect.getOutputStream());
-             BufferedOutputStream httpResponseBody = new BufferedOutputStream(this.connect.getOutputStream())
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(this.connection.getInputStream()));
+             PrintWriter httpResponseHead = new PrintWriter(this.connection.getOutputStream());
+             BufferedOutputStream httpResponseBody = new BufferedOutputStream(this.connection.getOutputStream())
         ) {
-            HttpRequest httpRequest = HttpRequest.parseFrom(in);
+            boolean keepAlive = true;
 
-            if(httpRequest == null){
-                return;
+            while (keepAlive){
+                HttpRequest httpRequest = HttpRequest.parseFrom(in);
+                if(httpRequest != null){
+                    System.out.println("Handling http request");
+                    this.handleHttpMethod(httpResponseHead, httpResponseBody, httpRequest);
+                }
+
             }
 
-            this.handleHttpMethod(httpResponseHead, httpResponseBody, httpRequest);
+            System.out.println("Ending connection I guess");
 
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Server error : " + ioe.getMessage(), ioe);
