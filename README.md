@@ -1,6 +1,15 @@
 [![Build Status](https://travis-ci.org/lennartblom/http-content-delivery-server.svg?branch=master)](https://travis-ci.org/lennartblom/http-content-delivery-server)
 
 
+**Application start**
+
+The java application is based on Maven and needs a running MongoDB instance on default port. 
+This can be achieved by running the provided docker-compose yml.
+
+`docker-compose -f docker/docker-compose.yml up`
+
+Afterwards you are good to go.
+
 **Architectural approach**
 
 The basic approach of the application is a HTTP server 
