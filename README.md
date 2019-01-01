@@ -15,14 +15,22 @@ In the future, logic implemented with this architectural approach could be used 
 a renewed way. The respective accesses to the used persistence layers are therefore reusable and 
 adapters (REST endpoint, message queue) do not contain closely coupled application logic.
 
-![](documentation/architecture.png)
+![](documentation/architecture.svg)
 
 **Procedural approach**
 
 For the processing of the HTTP connection the approach is shown in a BPMN diagram. 
 At this point the respective use of a cache validation is also illustrated.
 
-![](documentation/process_diagram.svg)
+![](documentation/http_handling.svg)
+
+**Caching**
+
+![](documentation/caching.svg)
+
+**Keep Alive**
+
+![](documentation/keep_alive.svg)
 
 
 **The approach to the low-level http connection handling is based on the [tutorial by @ssaurel](https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd)**
