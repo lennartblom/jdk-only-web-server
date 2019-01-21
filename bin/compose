@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+PROJECT_DIR=$( dirname "${BASH_SOURCE[0]}" )/..
+
+docker-compose \
+    --project-directory $PROJECT_DIR \
+    -f $PROJECT_DIR/docker/docker-compose.yml \
+    ${@}
