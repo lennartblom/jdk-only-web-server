@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/lennartblom/jdk-only-web-server.svg?branch=master)](https://travis-ci.org/lennartblom/jdk-only-web-server)
-
-
 **Application start**
 
 The java application is based on Maven and needs a running MongoDB instance on default port. 
