@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.application;
+package de.blom.httpserver.application;
 
 import de.blom.httpserver.adapter.inbound.http.HttpAdapter;
 
