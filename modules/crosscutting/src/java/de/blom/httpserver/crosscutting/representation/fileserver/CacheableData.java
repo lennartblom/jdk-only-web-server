@@ -1,6 +1,7 @@
 package de.blom.httpserver.crosscutting.representation.fileserver;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

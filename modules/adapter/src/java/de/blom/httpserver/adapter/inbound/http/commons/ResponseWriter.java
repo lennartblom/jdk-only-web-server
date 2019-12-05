@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
+import org.joda.time.DateTime;
 
 public class ResponseWriter {
 
@@ -192,7 +193,7 @@ public class ResponseWriter {
   }
 
   public static Date getCurrentDate() {
-    return new Date();
+    return DateTime.now().toDate();
   }
 
   private static class HtmlTemplateData {

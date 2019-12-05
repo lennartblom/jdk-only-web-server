@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,11 +33,7 @@ public class HttpRequest {
       final String rawBody) {
     this.method = identifyHTTPMethod(method);
     this.uri = uri;
-    if (headers != null) {
-      this.headers = headers;
-    } else {
-      this.headers = new HashMap<>();
-    }
+    this.headers = Objects.requireNonNullElseGet(headers, HashMap::new);
     this.rawBody = rawBody;
 
   }

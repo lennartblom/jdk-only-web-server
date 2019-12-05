@@ -2,6 +2,7 @@ package de.blom.httpserver.adapter.inbound.http;
 
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -40,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -97,6 +99,11 @@ public class HttpAdapterTest {
   @Before
   public void setup() {
 
+    this.httpAdapter =
+        new HttpAdapter(this.mockedSocket, this.responseWriter, this.directoryService,
+            this.wallContentService);
+    this.httpAdapter = Mockito.spy(this.httpAdapter);
+
     when(mockedDirectoryRequestDtoNotFound.getFound()).thenReturn(false);
 
     when(mockedDirectoryRequestDtoFound.getFound()).thenReturn(true);
@@ -147,9 +154,6 @@ public class HttpAdapterTest {
     HttpRequest incomingRequest = new HttpRequest("GET", ROOT_DIRECTORY, null, null);
     when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY))
         .thenReturn(this.mockedDirectoryRequestDtoFound);
-    doNothing()
-        .when(this.httpAdapter)
-        .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
     this.httpAdapter.handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader,
         this.httpResponseBody);
@@ -162,9 +166,6 @@ public class HttpAdapterTest {
   public void expectToCallFileHandling() throws IOException {
     HttpRequest incomingRequest = new HttpRequest("GET", INDEX_HTML, null, null);
     when(this.directoryService.handleFileRequest(INDEX_HTML)).thenReturn(mockedFileRequestDtoFound);
-    doNothing()
-        .when(this.httpAdapter)
-        .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
     this.httpAdapter.handleDirectoryServerRequest(incomingRequest, this.httpResponseHeader,
         this.httpResponseBody);
@@ -178,9 +179,6 @@ public class HttpAdapterTest {
     HttpRequest incomingRequest = new HttpRequest("HEAD", INDEX_HTML, null, null);
     when(this.directoryService.handleFileRequest(INDEX_HTML))
         .thenReturn(this.mockedFileRequestDtoNotFound);
-    doNothing()
-        .when(this.httpAdapter)
-        .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
     this.httpAdapter
         .handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
@@ -193,9 +191,7 @@ public class HttpAdapterTest {
     when(this.directoryService.handleFileRequest(INDEX_HTML))
         .thenReturn(this.mockedFileRequestDtoFound);
     HttpRequest incomingRequest = new HttpRequest("HEAD", INDEX_HTML, null, null);
-    doNothing()
-        .when(this.httpAdapter)
-        .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
+
 
     this.httpAdapter
         .handleFileRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
@@ -211,10 +207,6 @@ public class HttpAdapterTest {
     when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY))
         .thenReturn(this.mockedDirectoryRequestDtoNotFound);
 
-    doNothing()
-        .when(this.httpAdapter)
-        .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
-
     this.httpAdapter
         .handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
 
@@ -226,9 +218,6 @@ public class HttpAdapterTest {
     HttpRequest incomingRequest = new HttpRequest("HEAD", ROOT_DIRECTORY, null, null);
     when(this.directoryService.handleDirectoryRequest(ROOT_DIRECTORY))
         .thenReturn(this.mockedDirectoryRequestDtoFound);
-    doNothing()
-        .when(this.httpAdapter)
-        .validateCache(any(HttpRequest.CacheHeaders.class), any(CacheableData.class));
 
     this.httpAdapter
         .handleDirectoryRequest(incomingRequest, this.httpResponseHeader, this.httpResponseBody);
