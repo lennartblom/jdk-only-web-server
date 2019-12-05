@@ -1,9 +1,9 @@
-package de.blom.httpwebserver.adapter.inbound.http.commons;
+package de.blom.httpserver.adapter.inbound.http.commons;
 
 import com.google.gson.Gson;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.DirectoryRequestDto;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.FileRequestDto;
-import de.blom.httpwebserver.crosscutting.representation.wall.WallEntryOutboundDto;
+import de.blom.httpserver.crosscutting.representation.fileserver.DirectoryRequestDto;
+import de.blom.httpserver.crosscutting.representation.fileserver.FileRequestDto;
+import de.blom.httpserver.crosscutting.representation.wall.WallEntryOutboundDto;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -191,7 +191,7 @@ public class ResponseWriter {
     httpResponseHead.println("Date: " + ResponseWriter.getCurrentDate());
   }
 
-  static Date getCurrentDate() {
+  public static Date getCurrentDate() {
     return new Date();
   }
 

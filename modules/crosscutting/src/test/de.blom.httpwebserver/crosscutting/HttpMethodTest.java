@@ -1,6 +1,6 @@
 package de.blom.httpwebserver.crosscutting;
 
-import de.blom.httpwebserver.crosscutting.enums.HttpMethod;
+import de.blom.httpserver.crosscutting.enums.HttpMethod;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;

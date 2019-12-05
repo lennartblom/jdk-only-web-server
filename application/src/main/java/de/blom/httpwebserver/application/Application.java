@@ -1,6 +1,6 @@
 package de.blom.httpwebserver.application;
 
-import de.blom.httpwebserver.adapter.inbound.http.HttpAdapter;
+import de.blom.httpserver.adapter.inbound.http.HttpAdapter;
 
 public class Application {
 

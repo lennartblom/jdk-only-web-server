@@ -1,8 +1,8 @@
-package de.blom.httpwebserver.adapter.inbound.http.commons;
+package de.blom.httpserver.adapter.inbound.http.commons;
 
-import de.blom.httpwebserver.crosscutting.exception.DataNotModifiedException;
-import de.blom.httpwebserver.crosscutting.exception.ETagException;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.CacheableData;
+import de.blom.httpserver.crosscutting.exception.DataNotModifiedException;
+import de.blom.httpserver.crosscutting.exception.ETagException;
+import de.blom.httpserver.crosscutting.representation.fileserver.CacheableData;
 import java.util.Date;
 
 public class CacheValidator {

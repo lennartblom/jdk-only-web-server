@@ -1,8 +1,10 @@
-package de.blom.httpwebserver.adapter.inbound.http.commons;
+package de.blom.httpserver.adapter.inbound.http.commons;
 
-import de.blom.httpwebserver.crosscutting.exception.DataNotModifiedException;
-import de.blom.httpwebserver.crosscutting.exception.ETagException;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.FileRequestDto;
+import de.blom.httpserver.adapter.inbound.http.commons.CacheValidator;
+import de.blom.httpserver.adapter.inbound.http.commons.HttpRequest;
+import de.blom.httpserver.crosscutting.exception.DataNotModifiedException;
+import de.blom.httpserver.crosscutting.exception.ETagException;
+import de.blom.httpserver.crosscutting.representation.fileserver.FileRequestDto;
 import org.junit.Test;
 
 import java.util.Date;

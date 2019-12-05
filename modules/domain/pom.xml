@@ -13,6 +13,7 @@
 
 	<artifactId>domain</artifactId>
 	<version>2018.12.1-SNAPSHOT</version>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -25,7 +26,6 @@
 		<dependency>
 			<groupId>de.blom</groupId>
 			<artifactId>persistence</artifactId>
-			<version>2018.12.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -42,7 +42,6 @@
 		<dependency>
 			<groupId>de.blom</groupId>
 			<artifactId>crosscutting</artifactId>
-			<version>2018.12.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

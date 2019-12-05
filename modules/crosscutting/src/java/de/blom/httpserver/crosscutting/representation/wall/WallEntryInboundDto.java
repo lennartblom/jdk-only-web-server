@@ -1,7 +1,7 @@
-package de.blom.httpwebserver.crosscutting.representation.wall;
+package de.blom.httpserver.crosscutting.representation.wall;
 
 import com.google.gson.Gson;
-import de.blom.httpwebserver.crosscutting.exception.InvalidDataException;
+import de.blom.httpserver.crosscutting.exception.InvalidDataException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

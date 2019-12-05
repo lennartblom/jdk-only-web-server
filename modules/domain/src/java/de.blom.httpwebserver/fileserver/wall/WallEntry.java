@@ -1,7 +1,7 @@
 package de.blom.httpwebserver.fileserver.wall;
 
 import com.mongodb.BasicDBObject;
-import de.blom.httpwebserver.crosscutting.representation.wall.WallEntryInboundDto;
+import de.blom.httpserver.crosscutting.representation.wall.WallEntryInboundDto;
 import java.util.Date;
 import lombok.Getter;
 

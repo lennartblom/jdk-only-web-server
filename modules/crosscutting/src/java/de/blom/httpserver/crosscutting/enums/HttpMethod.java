@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.crosscutting.enums;
+package de.blom.httpserver.crosscutting.enums;
 
 public enum HttpMethod {
     GET,

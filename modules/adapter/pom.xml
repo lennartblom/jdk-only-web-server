@@ -17,12 +17,10 @@
 		<dependency>
 			<groupId>de.blom</groupId>
 			<artifactId>domain</artifactId>
-			<version>2018.12.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.blom</groupId>
 			<artifactId>crosscutting</artifactId>
-			<version>2018.12.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -31,6 +29,19 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
 		</dependency>
 	</dependencies>
 

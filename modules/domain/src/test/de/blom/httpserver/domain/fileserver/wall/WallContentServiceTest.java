@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import de.blom.httpwebserver.crosscutting.representation.wall.WallEntryInboundDto;
-import de.blom.httpwebserver.crosscutting.representation.wall.WallEntryOutboundDto;
+import de.blom.httpserver.crosscutting.representation.wall.WallEntryInboundDto;
+import de.blom.httpserver.crosscutting.representation.wall.WallEntryOutboundDto;
 import de.blom.httpwebserver.fileserver.wall.WallContentService;
 import de.blom.persistence.MongoDbRepository;
 import java.util.Arrays;

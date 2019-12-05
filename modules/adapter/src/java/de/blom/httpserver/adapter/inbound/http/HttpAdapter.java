@@ -1,20 +1,20 @@
-package de.blom.httpwebserver.adapter.inbound.http;
+package de.blom.httpserver.adapter.inbound.http;
 
-import de.blom.httpwebserver.adapter.inbound.http.commons.CacheValidator;
-import de.blom.httpwebserver.adapter.inbound.http.commons.HttpRequest;
-import de.blom.httpwebserver.adapter.inbound.http.commons.ResponseWriter;
-import de.blom.httpwebserver.crosscutting.enums.HttpMethod;
-import de.blom.httpwebserver.crosscutting.exception.DataNotModifiedException;
-import de.blom.httpwebserver.crosscutting.exception.ETagException;
-import de.blom.httpwebserver.crosscutting.exception.InvalidDataException;
-import de.blom.httpwebserver.crosscutting.exception.NotFoundException;
+import de.blom.httpserver.adapter.inbound.http.commons.CacheValidator;
+import de.blom.httpserver.adapter.inbound.http.commons.HttpRequest;
+import de.blom.httpserver.adapter.inbound.http.commons.ResponseWriter;
+import de.blom.httpserver.crosscutting.enums.HttpMethod;
+import de.blom.httpserver.crosscutting.exception.DataNotModifiedException;
+import de.blom.httpserver.crosscutting.exception.ETagException;
+import de.blom.httpserver.crosscutting.exception.InvalidDataException;
+import de.blom.httpserver.crosscutting.exception.NotFoundException;
 import de.blom.persistence.ServiceNotAvailableException;
-import de.blom.httpwebserver.crosscutting.exception.WrongContentTypeException;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.CacheableData;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.DirectoryRequestDto;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.FileRequestDto;
-import de.blom.httpwebserver.crosscutting.representation.wall.WallEntryInboundDto;
-import de.blom.httpwebserver.crosscutting.representation.wall.WallEntryOutboundDto;
+import de.blom.httpserver.crosscutting.exception.WrongContentTypeException;
+import de.blom.httpserver.crosscutting.representation.fileserver.CacheableData;
+import de.blom.httpserver.crosscutting.representation.fileserver.DirectoryRequestDto;
+import de.blom.httpserver.crosscutting.representation.fileserver.FileRequestDto;
+import de.blom.httpserver.crosscutting.representation.wall.WallEntryInboundDto;
+import de.blom.httpserver.crosscutting.representation.wall.WallEntryOutboundDto;
 import de.blom.httpwebserver.fileserver.DirectoryService;
 import de.blom.httpwebserver.fileserver.wall.WallContentService;
 import java.io.BufferedOutputStream;
@@ -228,6 +228,7 @@ public class HttpAdapter implements Runnable {
 
   void handleDirectoryRequest(final HttpRequest httpRequest, final PrintWriter httpResponseHead,
       final BufferedOutputStream httpResponseBody) throws IOException {
+    log.info("Test");
     final DirectoryRequestDto directoryRequestDto =
         this.directoryService.handleDirectoryRequest(httpRequest.getUri());
 

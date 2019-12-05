@@ -1,6 +1,7 @@
-package de.blom.httpwebserver.adapter.inbound.http.commons;
+package de.blom.httpserver.adapter.inbound.http.commons;
 
-import de.blom.httpwebserver.crosscutting.enums.HttpMethod;
+import de.blom.httpserver.adapter.inbound.http.commons.HttpRequest;
+import de.blom.httpserver.crosscutting.enums.HttpMethod;
 import org.hamcrest.Matchers;
 import org.hamcrest.beans.SamePropertyValuesAs;
 import org.junit.Assert;

@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.crosscutting.representation.fileserver;
+package de.blom.httpserver.crosscutting.representation.fileserver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

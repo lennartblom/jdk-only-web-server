@@ -1,7 +1,7 @@
 package de.blom.httpwebserver.fileserver;
 
-import de.blom.httpwebserver.crosscutting.representation.fileserver.DirectoryRequestDto;
-import de.blom.httpwebserver.crosscutting.representation.fileserver.FileRequestDto;
+import de.blom.httpserver.crosscutting.representation.fileserver.DirectoryRequestDto;
+import de.blom.httpserver.crosscutting.representation.fileserver.FileRequestDto;
 import de.blom.persistence.FileSystem;
 import java.io.File;
 import java.io.IOException;

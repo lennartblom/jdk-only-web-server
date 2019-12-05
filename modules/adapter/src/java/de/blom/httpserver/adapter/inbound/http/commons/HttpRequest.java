@@ -1,6 +1,6 @@
-package de.blom.httpwebserver.adapter.inbound.http.commons;
+package de.blom.httpserver.adapter.inbound.http.commons;
 
-import de.blom.httpwebserver.crosscutting.enums.HttpMethod;
+import de.blom.httpserver.crosscutting.enums.HttpMethod;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -185,7 +186,8 @@ public class HttpRequest {
 
   @Data
   @AllArgsConstructor
-  private static class Header {
+  @EqualsAndHashCode
+  public static class Header {
     private String name;
     private String value;
   }
@@ -194,6 +196,7 @@ public class HttpRequest {
   @AllArgsConstructor
   @NoArgsConstructor
   @Builder
+  @EqualsAndHashCode
   public static class CacheHeaders {
     private String ifNonMatch;
     private String ifMatch;
