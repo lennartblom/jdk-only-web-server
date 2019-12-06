@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import com.mongodb.DBObject;
 
 import de.blom.httpserver.crosscutting.representation.wall.WallEntryInboundDto;
-import de.blom.httpwebserver.fileserver.wall.WallEntry;
+import de.blom.httpserver.fileserver.wall.WallEntry;
 import java.util.Date;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;

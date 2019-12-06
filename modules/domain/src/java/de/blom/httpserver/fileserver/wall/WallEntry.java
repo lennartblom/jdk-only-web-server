@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.fileserver.wall;
+package de.blom.httpserver.fileserver.wall;
 
 import com.mongodb.BasicDBObject;
 import de.blom.httpserver.crosscutting.representation.wall.WallEntryInboundDto;

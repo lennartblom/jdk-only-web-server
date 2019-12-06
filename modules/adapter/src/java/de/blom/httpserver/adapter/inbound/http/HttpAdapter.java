@@ -15,8 +15,8 @@ import de.blom.httpserver.crosscutting.representation.fileserver.DirectoryReques
 import de.blom.httpserver.crosscutting.representation.fileserver.FileRequestDto;
 import de.blom.httpserver.crosscutting.representation.wall.WallEntryInboundDto;
 import de.blom.httpserver.crosscutting.representation.wall.WallEntryOutboundDto;
-import de.blom.httpwebserver.fileserver.DirectoryService;
-import de.blom.httpwebserver.fileserver.wall.WallContentService;
+import de.blom.httpserver.fileserver.DirectoryService;
+import de.blom.httpserver.fileserver.wall.WallContentService;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;

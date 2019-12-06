@@ -11,7 +11,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import de.blom.httpserver.crosscutting.representation.wall.WallEntryInboundDto;
 import de.blom.httpserver.crosscutting.representation.wall.WallEntryOutboundDto;
-import de.blom.httpwebserver.fileserver.wall.WallContentService;
+import de.blom.httpserver.fileserver.wall.WallContentService;
 import de.blom.persistence.MongoDbRepository;
 import java.util.Arrays;
 import java.util.Date;

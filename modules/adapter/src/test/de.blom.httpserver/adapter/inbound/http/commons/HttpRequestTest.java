@@ -23,12 +23,15 @@ import static org.junit.Assert.*;
 
 public class HttpRequestTest {
 
+
+    // TODO Extract test files to suitable test resource file
     private static final String TEST_HTTP_REQUEST_NO_BODY = "GET /pub/WWW/TheProject.html HTTP/1.1\n" +
             "Host: google.com\n" +
             "cache-control: no-cache\n" +
             "Postman-Token: 96621bec-a11a-4c9c-a7ff-6a87c9369e02\n" +
             "";
 
+    // TODO Extract test files to suitable test resource file
     private static final String TEST_HTTP_REQUEST_PLAIN_TEXT_BODY = "POST /testRoute HTTP/1.1\n" +
             "Host: localhost\n" +
             "Content-Type: text/plain\n" +
@@ -37,6 +40,7 @@ public class HttpRequestTest {
             "Lorem ipsum dolor\n" +
             "\n";
 
+    // TODO Extract test files to suitable test resource file
     private static final String TEST_HTTP_REQUEST_JSON_BODY = "POST /testRoute HTTP/1.1\n" +
             "Host: localhost\n" +
             "Content-Type: application/json\n" +
@@ -49,6 +53,7 @@ public class HttpRequestTest {
             "}\n" +
             "\n";
 
+    // TODO Extract test files to suitable test resource file
     private static final String TEST_HTTP_REQUEST_JSON_BODY_NO_BLANK_LAST_LINE = "POST /testRoute HTTP/1.1\n" +
             "Host: localhost\n" +
             "Content-Type: application/json\n" +
@@ -59,11 +64,11 @@ public class HttpRequestTest {
             "  \"login\": \"asd\",\n" +
             "  \"password\": \"testpassword\"\n" +
             "}\n";
-
+    // TODO Extract test files to suitable test resource file
     private static final String TEST_CHROME_REQUEST = "GET / HTTP/1.1\n" +
             "Host: localhost:8080\n" +
             "Connection: keep-alive\n" +
-            "Dec 28, 2018 6:11:18 PM de.blom.httpwebserver.adapter.inbound.http.HttpAdapter main\n" +
+            "Dec 28, 2018 6:11:18 PM de.blom.httpserver.adapter.inbound.http.HttpAdapter main\n" +
             "INFO: Connection opened. (Fri Dec 28 18:11:18 CET 2018)\n" +
             "Cache-Control: max-age=0\n" +
             "Upgrade-Insecure-Requests: 1\n" +
@@ -73,7 +78,7 @@ public class HttpRequestTest {
             "Accept-Language: de,en-US;q=0.9,en;q=0.8\n" +
             "Cookie: PHPSESSID=3d8ujruupf7hf7su1gs2c7jcj6; JSESSIONID=1067490977143665192; grafana_sess=32da410c3a4292d1; redirect_to=%252F; io=kucVFKNOXuMq3nDRAAAa\n" +
             " \n";
-
+    // TODO Extract test files to suitable test resource file
     private static final String TEST_JQUERY_AJAX_CALL = "POST /wall_entries HTTP/1.1\n" +
             "Host: localhost:8080\n" +
             "Connection: keep-alive\n" +

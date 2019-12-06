@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.fileserver;
+package de.blom.httpserver.fileserver;
 
 import de.blom.httpserver.crosscutting.representation.fileserver.DirectoryRequestDto;
 import de.blom.httpserver.crosscutting.representation.fileserver.FileRequestDto;

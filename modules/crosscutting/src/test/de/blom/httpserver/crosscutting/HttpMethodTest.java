@@ -1,4 +1,4 @@
-package de.blom.httpwebserver.crosscutting;
+package de.blom.httpserver.crosscutting;
 
 import de.blom.httpserver.crosscutting.enums.HttpMethod;
 import org.junit.Test;
